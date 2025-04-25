@@ -1,0 +1,10 @@
+package com.guilherme.knowyourfan.knowyourfan.data.remote.firebase
+
+import com.guilherme.knowyourfan.domain.AuthenticationError
+import com.guilherme.knowyourfan.domain.Result
+
+interface FirebaseAuthentication {
+
+    suspend fun authenticateWithGoogle(): Result<Unit, AuthenticationError.Authentication>
+
+}

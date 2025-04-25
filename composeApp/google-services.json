@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "716394498537",
+    "project_id": "know-your-fan-8f572",
+    "storage_bucket": "know-your-fan-8f572.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:716394498537:android:832af4c3cc29c43034e378",
+        "android_client_info": {
+          "package_name": "com.guilherme.knowyourfan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "716394498537-onhobq835cld55441t0vjc3493kpop0a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.guilherme.knowyourfan",
+            "certificate_hash": "be975b5efab21739fcec53936f0d178d75224e9f"
+          }
+        },
+        {
+          "client_id": "716394498537-2a062viguauoqrh33tn41fvpfn5luho2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDDxuTYiGTair2b4GkmTvHRMIKDJt3jhg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "716394498537-2a062viguauoqrh33tn41fvpfn5luho2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

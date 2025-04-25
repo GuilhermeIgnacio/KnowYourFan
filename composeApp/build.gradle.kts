@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.pluginSerialization)
+    alias(libs.plugins.googleServices)
 }
 
 kotlin {
@@ -37,12 +39,43 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+
+            //Firebase
+            implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation("com.google.firebase:firebase-auth")
+
+            //Koin
+            implementation(project.dependencies.platform(libs.koin.bom))
+            implementation(libs.koin.core)
+            implementation("io.insert-koin:koin-compose-viewmodel")
+            implementation("io.insert-koin:koin-android")
+
+            //Credential Manager
+            implementation("androidx.credentials:credentials:1.5.0")
+            implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+            implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
+            //Serialization
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+
+            //ViewModel
+            implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
+
+            //Navigation
+            implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
+
+            //Extended Icons
+            implementation("androidx.compose.material:material-icons-extended:1.7.8")
+
+            //Google Fonts
+            implementation("androidx.compose.ui:ui-text-google-fonts:1.8.0")
+
         }
     }
 }
@@ -75,6 +108,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.navigation.compose)
     debugImplementation(compose.uiTooling)
 }
 
