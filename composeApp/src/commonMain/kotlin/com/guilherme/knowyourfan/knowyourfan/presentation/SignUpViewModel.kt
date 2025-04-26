@@ -36,10 +36,15 @@ class SignUpViewModel(
     fun onEvent(event: SignUpEvents) {
         when (event) {
             is SignUpEvents.OnUsernameTextFieldValueChanged -> {
-                _state.update {
-                    it.copy(
-                        usernameTextField = event.value
-                    )
+
+                val usernameRegex = Regex("^[a-zA-Z0-9]*$")
+
+                if (event.value.matches(usernameRegex) && event.value.length <= 16) {
+                    _state.update {
+                        it.copy(
+                            usernameTextField = event.value
+                        )
+                    }
                 }
             }
 
@@ -76,11 +81,15 @@ class SignUpViewModel(
             }
 
             is SignUpEvents.OnIdTextFieldValueChanged -> {
-                _state.update {
-                    it.copy(
-                        idTextField = event.value
-                    )
+
+                if (event.value.length <= 11) {
+                    _state.update {
+                        it.copy(
+                            idTextField = event.value.filter { char -> char.isDigit() }
+                        )
+                    }
                 }
+
             }
 
             is SignUpEvents.OnGameChipClicked -> {

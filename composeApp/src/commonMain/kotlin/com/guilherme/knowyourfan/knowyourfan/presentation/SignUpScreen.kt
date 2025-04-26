@@ -2,14 +2,12 @@ package com.guilherme.knowyourfan.knowyourfan.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,6 +47,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.guilherme.knowyourfan.core.presentation.CpfVisualTransformation
 import com.guilherme.knowyourfan.core.presentation.dashedBorder
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.address_card_regular
@@ -119,11 +118,23 @@ fun SignUpScreen(
             interestGamesList = state.interestGamesList
         )
 
+        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$".toRegex()
+        val cpfRegex = Regex("""^(\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$""")
         Button(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Max),
             onClick = {/*Todo Sign In*/ },
+
+            enabled = !state.usernameTextField.isNullOrEmpty()
+                    && !state.emailTextField.isNullOrEmpty()
+                    && state.emailTextField == state.confirmEmailTextField
+                    && state.emailTextField!!.matches(emailRegex)
+                    && !state.idTextField.isNullOrEmpty()
+                    && state.idTextField!!.matches(cpfRegex)
+                    && !state.passwordTextField.isNullOrEmpty()
+                    && state.passwordTextField == state.confirmPasswordTextField,
+
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors().copy(
                 contentColor = Color.Black,
@@ -329,6 +340,8 @@ private fun TextFields(
         value = state.idTextField ?: "",
         onValueChange = { onEvent(SignUpEvents.OnIdTextFieldValueChanged(it)) },
         placeholder = { Text(text = "CPF") },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        visualTransformation = CpfVisualTransformation(),
         leadingIcon = {
             Icon(
                 modifier = Modifier.size(24.dp),
