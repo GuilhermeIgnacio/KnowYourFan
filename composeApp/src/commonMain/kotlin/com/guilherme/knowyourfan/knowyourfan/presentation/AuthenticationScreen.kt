@@ -92,34 +92,7 @@ fun AuthenticationScreen(
     }
 
     val interactionSource = remember { MutableInteractionSource() }
-
-    val localDensity = LocalDensity.current
-    var outlinedTextFieldHeight by remember {
-        mutableStateOf(0.dp)
-    }
-
-    /**
-     * Outlined Text Field Colors
-     */
     val placeholderTextColor = Color(0xFF515151)
-    val outlinedTextFieldContainerColor = Color(0xFF1E1E1E)
-    val indicatorColor = Color.Transparent
-    val iconsColor = Color(0xFF606060)
-
-
-    val outlinedTextFieldColors = OutlinedTextFieldDefaults.colors().copy(
-        unfocusedContainerColor = outlinedTextFieldContainerColor,
-        focusedContainerColor = outlinedTextFieldContainerColor,
-        unfocusedIndicatorColor = indicatorColor,
-        focusedIndicatorColor = indicatorColor,
-        focusedPlaceholderColor = placeholderTextColor,
-        unfocusedPlaceholderColor = placeholderTextColor,
-        cursorColor = placeholderTextColor,
-        errorCursorColor = placeholderTextColor,
-    )
-    /**
-     * Outlined Text Field Colors
-     */
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
