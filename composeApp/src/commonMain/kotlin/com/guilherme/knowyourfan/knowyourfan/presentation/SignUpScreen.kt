@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
@@ -36,12 +38,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.guilherme.knowyourfan.core.presentation.dashedBorder
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.address_card_regular
 import knowyourfan.composeapp.generated.resources.furia_logo
@@ -72,6 +76,7 @@ fun SignUpScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 8.dp)
             .statusBarsPadding()
             .navigationBarsPadding(),
@@ -206,7 +211,18 @@ fun SignUpScreen() {
             )
 
             Column(
-                modifier = Modifier.border(2.dp, color = Color.White,).padding(all = 24.dp),
+                modifier = Modifier
+                    .dashedBorder(
+                        width = 1.dp,
+                        brush = Brush.horizontalGradient(
+                            listOf(
+                                placeholderTextColor,
+                                placeholderTextColor
+                            )
+                        ),
+                        shape = RoundedCornerShape(12.dp), on = 8.dp, off = 8.dp
+                    )
+                    .padding(all = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -230,7 +246,7 @@ fun SignUpScreen() {
                 )
 
                 OutlinedButton(
-                    onClick = {/*Todo: pick photo*/},
+                    onClick = {/*Todo: pick photo*/ },
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(text = "Submit")
