@@ -10,6 +10,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.guilherme.knowyourfan.knowyourfan.presentation.AuthenticationScreen
+import com.guilherme.knowyourfan.knowyourfan.presentation.SignUpScreen
 
 @Composable
 fun App() {
@@ -22,8 +23,13 @@ fun App() {
             ) {
                 composable<Route.AuthenticationScreen> {
                     AuthenticationScreen(
-                        onAuth = { navController.navigate(Route.HomeGraph) }
+                        onAuth = { navController.navigate(Route.HomeGraph) },
+                        onSignUpClick = { navController.navigate(Route.SignUpScreen) }
                     )
+                }
+
+                composable<Route.SignUpScreen> {
+                    SignUpScreen()
                 }
 
             }

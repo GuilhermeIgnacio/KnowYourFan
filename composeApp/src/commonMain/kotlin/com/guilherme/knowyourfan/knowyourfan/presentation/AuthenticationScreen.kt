@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,6 +55,7 @@ import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.apple_brands
 import knowyourfan.composeapp.generated.resources.furia_logo
 import knowyourfan.composeapp.generated.resources.google_brands
+import knowyourfan.composeapp.generated.resources.x_twitter_brands
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.stringResource
@@ -62,7 +64,8 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AuthenticationScreen(
-    onAuth: () -> Unit
+    onAuth: () -> Unit,
+    onSignUpClick: () -> Unit
 ) {
 
 
@@ -79,7 +82,10 @@ fun AuthenticationScreen(
             )
 
             when (snackBar) {
-                SnackbarResult.Dismissed -> { viewModel.clearErrorMessage() }
+                SnackbarResult.Dismissed -> {
+                    viewModel.clearErrorMessage()
+                }
+
                 SnackbarResult.ActionPerformed -> {}
             }
         }
@@ -136,64 +142,10 @@ fun AuthenticationScreen(
 
             Headers(placeholderTextColor)
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    value = state.emailTextField ?: "",
-                    onValueChange = { onEvent(AuthenticationEvents.OnEmailTextFieldValueChanged(it)) },
-                    placeholder = { Text(text = "Email") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Outlined.Person,
-                            contentDescription = "",
-                            tint = iconsColor
-                        )
-                    },
-                    maxLines = 1,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = outlinedTextFieldColors,
-
-                    )
-
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onGloballyPositioned { coordinates ->
-                            outlinedTextFieldHeight =
-                                with(localDensity) { coordinates.size.height.toDp() }
-                        },
-                    value = state.passwordTextField ?: "",
-                    onValueChange = {
-                        onEvent(
-                            AuthenticationEvents.OnPasswordTextFieldValueChanged(
-                                it
-                            )
-                        )
-                    },
-                    placeholder = { Text(text = "Password") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Outlined.Lock,
-                            contentDescription = "",
-                            tint = iconsColor
-                        )
-                    },
-                    trailingIcon = {},
-                    maxLines = 1,
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = outlinedTextFieldColors,
-                )
-            }
-
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(outlinedTextFieldHeight),
+                    .height(IntrinsicSize.Max),
                 onClick = {/*Todo Sign In*/ },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors().copy(
@@ -201,19 +153,23 @@ fun AuthenticationScreen(
                     containerColor = Color.White,
                 )
             ) {
-                Text(text = "Sign In")
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    imageVector = vectorResource(Res.drawable.x_twitter_brands),
+                    contentDescription = "",
+                    tint = Color.Black
+                )
+
+                Spacer(Modifier.width(12.dp))
+
+                Text(text = "Sign In With X")
             }
 
-            OrSection(placeholderTextColor)
-
-            GoogleAndAppleSignInMethods(
-                outlinedTextFieldHeight = outlinedTextFieldHeight,
-                onSignInWithGoogleButtonClicked = { onEvent(AuthenticationEvents.OnSignInWithGoogleButtonClicked) }
+            CreateAccountText(
+                placeholderTextColor = placeholderTextColor,
+                interactionSource = interactionSource,
+                onSignUpClick = { onSignUpClick() }
             )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            CreateAccountText(placeholderTextColor, interactionSource)
 
         }
     }
@@ -232,6 +188,7 @@ fun AuthenticationScreen(
 private fun CreateAccountText(
     placeholderTextColor: Color,
     interactionSource: MutableInteractionSource,
+    onSignUpClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -247,7 +204,7 @@ private fun CreateAccountText(
             modifier = Modifier.clickable(
                 interactionSource = interactionSource,
                 indication = null
-            ) { /*Todo: Navigate to account creation screen*/ },
+            ) { onSignUpClick() },
             text = "Sign Up",
             color = Color.White
         )
