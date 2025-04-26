@@ -11,6 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.guilherme.knowyourfan.knowyourfan.presentation.AuthenticationScreen
 import com.guilherme.knowyourfan.knowyourfan.presentation.SignUpScreen
+import com.guilherme.knowyourfan.knowyourfan.presentation.SignUpViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun App() {
@@ -29,7 +31,8 @@ fun App() {
                 }
 
                 composable<Route.SignUpScreen> {
-                    SignUpScreen()
+                    val signUpViewModel = koinViewModel<SignUpViewModel>()
+                    SignUpScreen(viewModel = signUpViewModel)
                 }
 
             }
@@ -37,7 +40,7 @@ fun App() {
             navigation<Route.HomeGraph>(
                 startDestination = Route.HomeScreen
             ) {
-                composable<Route.HomeScreen> {  }
+                composable<Route.HomeScreen> { }
             }
 
         }

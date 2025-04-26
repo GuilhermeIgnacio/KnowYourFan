@@ -38,6 +38,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -47,6 +48,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.guilherme.knowyourfan.core.presentation.dashedBorder
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.address_card_regular
@@ -57,7 +59,12 @@ import org.jetbrains.compose.resources.vectorResource
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun SignUpScreen() {
+fun SignUpScreen(
+    viewModel: SignUpViewModel,
+) {
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val onEvent = viewModel::onEvent
 
     val outlinedTextFieldContainerColor = Color(0xFF1E1E1E)
     val indicatorColor = Color.Transparent
@@ -95,11 +102,22 @@ fun SignUpScreen() {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        TextFields(iconsColor, outlinedTextFieldColors)
+        TextFields(
+            iconsColor = iconsColor,
+            outlinedTextFieldColors = outlinedTextFieldColors,
+            state = state,
+            onEvent = onEvent
+        )
 
         IdSection(placeholderTextColor, outlinedTextFieldContainerColor)
 
-        InterestGamesSection(placeholderTextColor)
+        InterestGamesSection(
+            placeholderTextColor = placeholderTextColor,
+            onChipClicked = {
+                onEvent(SignUpEvents.OnGameChipClicked(it))
+            },
+            interestGamesList = state.interestGamesList
+        )
 
         Button(
             modifier = Modifier
@@ -121,7 +139,11 @@ fun SignUpScreen() {
 
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
-private fun InterestGamesSection(placeholderTextColor: Color) {
+private fun InterestGamesSection(
+    placeholderTextColor: Color,
+    onChipClicked: (ChipItem) -> Unit,
+    interestGamesList: List<ChipItem>,
+) {
     val games = listOf(
         ChipItem(
             game = "Counter-Strike",
@@ -166,12 +188,12 @@ private fun InterestGamesSection(placeholderTextColor: Color) {
 
         games.forEach {
             FilterChip(
-                onClick = { },
+                onClick = { onChipClicked(it) },
                 label = {
                     Text(text = it.game)
                 },
                 shape = RoundedCornerShape(100),
-                selected = false,
+                selected = it in interestGamesList,
                 leadingIcon = if (it.icon != null) {
                     {
                         Icon(
@@ -248,11 +270,13 @@ private fun IdSection(
 private fun TextFields(
     iconsColor: Color,
     outlinedTextFieldColors: TextFieldColors,
+    state: SignUpState,
+    onEvent: (SignUpEvents) -> Unit,
 ) {
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = "",
-        onValueChange = { },
+        value = state.usernameTextField ?: "",
+        onValueChange = { onEvent(SignUpEvents.OnUsernameTextFieldValueChanged(it)) },
         placeholder = { Text(text = "Username") },
         leadingIcon = {
             Icon(
@@ -268,8 +292,8 @@ private fun TextFields(
 
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = "",
-        onValueChange = { },
+        value = state.emailTextField ?: "",
+        onValueChange = { onEvent(SignUpEvents.OnEmailTextFieldValueChanged(it)) },
         placeholder = { Text(text = "Email") },
         leadingIcon = {
             Icon(
@@ -285,8 +309,8 @@ private fun TextFields(
 
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = "",
-        onValueChange = { },
+        value = state.confirmEmailTextField ?: "",
+        onValueChange = { onEvent(SignUpEvents.OnConfirmEmailTextFieldValueChanged(it)) },
         placeholder = { Text(text = "Confirm Email") },
         leadingIcon = {
             Icon(
@@ -302,8 +326,8 @@ private fun TextFields(
 
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
-        value = "",
-        onValueChange = { },
+        value = state.idTextField ?: "",
+        onValueChange = { onEvent(SignUpEvents.OnIdTextFieldValueChanged(it)) },
         placeholder = { Text(text = "CPF") },
         leadingIcon = {
             Icon(
@@ -321,8 +345,8 @@ private fun TextFields(
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth(),
-        value = "",
-        onValueChange = {},
+        value = state.passwordTextField ?: "",
+        onValueChange = { onEvent(SignUpEvents.OnPasswordTextFieldValueChanged(it)) },
         placeholder = { Text(text = "Password") },
         leadingIcon = {
             Icon(
@@ -342,8 +366,8 @@ private fun TextFields(
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth(),
-        value = "",
-        onValueChange = {},
+        value = state.confirmPasswordTextField ?: "",
+        onValueChange = { onEvent(SignUpEvents.OnConfirmPasswordTextFieldValueChanged(it)) },
         placeholder = { Text(text = "Confirm Password") },
         leadingIcon = {
             Icon(
