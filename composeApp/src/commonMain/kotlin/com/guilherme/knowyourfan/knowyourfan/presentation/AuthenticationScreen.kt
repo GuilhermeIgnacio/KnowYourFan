@@ -27,8 +27,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,20 +49,41 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.guilherme.knowyourfan.knowyourfan.presentation.composables.LoadingIcon
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.apple_brands
 import knowyourfan.composeapp.generated.resources.furia_logo
 import knowyourfan.composeapp.generated.resources.google_brands
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.imageResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun AuthenticationScreen() {
+fun AuthenticationScreen(
+    onAuth: () -> Unit
+) {
+
 
     val viewModel = koinViewModel<AuthenticationViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val onEvent = viewModel::onEvent
+
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(state.errorMessage) {
+        state.errorMessage?.let {
+            val snackBar = snackBarHostState.showSnackbar(
+                message = getString(it)
+            )
+
+            when (snackBar) {
+                SnackbarResult.Dismissed -> { viewModel.clearErrorMessage() }
+                SnackbarResult.ActionPerformed -> {}
+            }
+        }
+    }
 
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -89,98 +115,117 @@ fun AuthenticationScreen() {
      * Outlined Text Field Colors
      */
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 8.dp)
-            .statusBarsPadding()
-            .navigationBarsPadding(),
-        verticalArrangement = Arrangement.spacedBy(32.dp)
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) {
-        Image(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .size(48.dp),
-            bitmap = imageResource(Res.drawable.furia_logo),
-            contentDescription = ""
-        )
-
-        Headers(placeholderTextColor)
-
         Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp)
+                .statusBarsPadding()
+                .navigationBarsPadding(),
+            verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            OutlinedTextField(
+            Image(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                value = state.emailTextField ?: "",
-                onValueChange = { onEvent(AuthenticationEvents.OnEmailTextFieldValueChanged(it)) },
-                placeholder = { Text(text = "Email") },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Outlined.Person,
-                        contentDescription = "",
-                        tint = iconsColor
+                    .align(Alignment.CenterHorizontally)
+                    .size(48.dp),
+                bitmap = imageResource(Res.drawable.furia_logo),
+                contentDescription = ""
+            )
+
+            Headers(placeholderTextColor)
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    value = state.emailTextField ?: "",
+                    onValueChange = { onEvent(AuthenticationEvents.OnEmailTextFieldValueChanged(it)) },
+                    placeholder = { Text(text = "Email") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Outlined.Person,
+                            contentDescription = "",
+                            tint = iconsColor
+                        )
+                    },
+                    maxLines = 1,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = outlinedTextFieldColors,
+
                     )
-                },
-                maxLines = 1,
-                shape = RoundedCornerShape(12.dp),
-                colors = outlinedTextFieldColors,
 
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onGloballyPositioned { coordinates ->
+                            outlinedTextFieldHeight =
+                                with(localDensity) { coordinates.size.height.toDp() }
+                        },
+                    value = state.passwordTextField ?: "",
+                    onValueChange = {
+                        onEvent(
+                            AuthenticationEvents.OnPasswordTextFieldValueChanged(
+                                it
+                            )
+                        )
+                    },
+                    placeholder = { Text(text = "Password") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Outlined.Lock,
+                            contentDescription = "",
+                            tint = iconsColor
+                        )
+                    },
+                    trailingIcon = {},
+                    maxLines = 1,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = outlinedTextFieldColors,
                 )
+            }
 
-            OutlinedTextField(
+            Button(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onGloballyPositioned { coordinates ->
-                        outlinedTextFieldHeight =
-                            with(localDensity) { coordinates.size.height.toDp() }
-                    },
-                value = state.passwordTextField ?: "",
-                onValueChange = { onEvent(AuthenticationEvents.OnPasswordTextFieldValueChanged(it)) },
-                placeholder = { Text(text = "Password") },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Outlined.Lock,
-                        contentDescription = "",
-                        tint = iconsColor
-                    )
-                },
-                trailingIcon = {},
-                maxLines = 1,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    .height(outlinedTextFieldHeight),
+                onClick = {/*Todo Sign In*/ },
                 shape = RoundedCornerShape(12.dp),
-                colors = outlinedTextFieldColors,
+                colors = ButtonDefaults.buttonColors().copy(
+                    contentColor = Color.Black,
+                    containerColor = Color.White,
+                )
+            ) {
+                Text(text = "Sign In")
+            }
+
+            OrSection(placeholderTextColor)
+
+            GoogleAndAppleSignInMethods(
+                outlinedTextFieldHeight = outlinedTextFieldHeight,
+                onSignInWithGoogleButtonClicked = { onEvent(AuthenticationEvents.OnSignInWithGoogleButtonClicked) }
             )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            CreateAccountText(placeholderTextColor, interactionSource)
+
         }
-
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(outlinedTextFieldHeight),
-            onClick = {/*Todo Sign In*/ },
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors().copy(
-                contentColor = Color.Black,
-                containerColor = Color.White,
-            )
-        ) {
-            Text(text = "Sign In")
-        }
-
-        OrSection(placeholderTextColor)
-
-        GoogleAndAppleSignInMethods(
-            outlinedTextFieldHeight = outlinedTextFieldHeight,
-            onSignInWithGoogleButtonClicked = { onEvent(AuthenticationEvents.OnSignInWithGoogleButtonClicked) }
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        CreateAccountText(placeholderTextColor, interactionSource)
-
     }
+
+    if (state.isLoading) {
+        LoadingIcon()
+    }
+
+    if (state.isAuthenticated) {
+        onAuth()
+    }
+
 }
 
 @Composable

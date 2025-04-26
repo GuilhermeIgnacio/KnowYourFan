@@ -1,0 +1,11 @@
+<resources>
+    <string name="unknown_error_occurred_message">An unexpected problem occurred</string>
+
+    <string name="get_credential_cancellation_exception_message">Operation cancelled by user.</string>
+    <string name="get_credential_interrupted_exception_message">Credential flow has been interrupted. Please try again.</string>
+    <string name="get_credential_unknown_exception_message">Credential operation failed. Please try again or restart your app.</string>
+
+    <string name="firebase_auth_invalid_user_exception_message">Invalid User</string>
+    <string name="firebase_auth_invalid_credentials_exception_message">Invalid Credentials</string>
+    <string name="firebase_auth_user_collision_exception_message">An account with this email address already exists, please trya different one.</string>
+</resources>

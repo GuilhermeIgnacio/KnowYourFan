@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.guilherme.knowyourfan.knowyourfan.presentation.AuthenticationScreen
@@ -20,10 +21,19 @@ fun App() {
                 startDestination = Route.AuthenticationScreen
             ) {
                 composable<Route.AuthenticationScreen> {
-                    AuthenticationScreen()
+                    AuthenticationScreen(
+                        onAuth = { navController.navigate(Route.HomeGraph) }
+                    )
                 }
 
             }
+
+            navigation<Route.HomeGraph>(
+                startDestination = Route.HomeScreen
+            ) {
+                composable<Route.HomeScreen> {  }
+            }
+
         }
     }
 
