@@ -14,6 +14,7 @@ data class SignUpState(
     val passwordTextField: String? = null,
     val confirmPasswordTextField: String? = null,
     val interestGamesList: List<ChipItem> = emptyList(),
+    val selectedImageByteArray: ByteArray? = null,
 )
 
 sealed interface SignUpEvents {
@@ -24,6 +25,8 @@ sealed interface SignUpEvents {
     data class OnPasswordTextFieldValueChanged(val value: String) : SignUpEvents
     data class OnConfirmPasswordTextFieldValueChanged(val value: String) : SignUpEvents
     data class OnGameChipClicked(val value: ChipItem) : SignUpEvents
+    data class OnImageSelected(val value: ByteArray) : SignUpEvents
+    data object OnRemoveImageSelected : SignUpEvents
 }
 
 class SignUpViewModel(
@@ -103,6 +106,23 @@ class SignUpViewModel(
 
                 _state.update { it.copy(interestGamesList = mutableList) }
             }
+
+            SignUpEvents.OnRemoveImageSelected -> {
+                _state.update {
+                    it.copy(
+                        selectedImageByteArray = null
+                    )
+                }
+            }
+
+            is SignUpEvents.OnImageSelected -> {
+                _state.update {
+                    it.copy(
+                        selectedImageByteArray = event.value
+                    )
+                }
+            }
+
         }
     }
 

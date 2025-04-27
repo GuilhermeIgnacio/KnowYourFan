@@ -76,6 +76,12 @@ kotlin {
             //Google Fonts
             implementation("androidx.compose.ui:ui-text-google-fonts:1.8.0")
 
+            //Peekaboo - Image Picker
+            implementation("io.github.onseok:peekaboo-image-picker:0.5.2")
+
+            //Coil
+            implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+            implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
         }
     }
 }

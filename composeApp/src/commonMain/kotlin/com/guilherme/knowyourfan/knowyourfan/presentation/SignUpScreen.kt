@@ -2,12 +2,14 @@ package com.guilherme.knowyourfan.knowyourfan.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
@@ -29,7 +32,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -37,18 +42,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.guilherme.knowyourfan.core.presentation.CpfVisualTransformation
 import com.guilherme.knowyourfan.core.presentation.dashedBorder
+import com.preat.peekaboo.image.picker.SelectionMode
+import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.address_card_regular
 import knowyourfan.composeapp.generated.resources.furia_logo
@@ -108,7 +119,12 @@ fun SignUpScreen(
             onEvent = onEvent
         )
 
-        IdSection(placeholderTextColor, outlinedTextFieldContainerColor)
+        IdSection(
+            placeholderTextColor = placeholderTextColor,
+            outlinedTextFieldContainerColor = outlinedTextFieldContainerColor,
+            state = state,
+            onEvent = onEvent
+        )
 
         InterestGamesSection(
             placeholderTextColor = placeholderTextColor,
@@ -226,55 +242,93 @@ private fun InterestGamesSection(
 private fun IdSection(
     placeholderTextColor: Color,
     outlinedTextFieldContainerColor: Color,
+    state: SignUpState,
+    onEvent: (SignUpEvents) -> Unit,
 ) {
+
+    val scope = rememberCoroutineScope()
+
+
+    val singleImagePicker = rememberImagePickerLauncher(
+        selectionMode = SelectionMode.Single,
+        scope = scope,
+        onResult = { byteArrays ->
+            byteArrays.firstOrNull()?.let {
+                // Process the selected images' ByteArrays.
+                onEvent(SignUpEvents.OnImageSelected(it))
+            }
+        }
+    )
+
     Text(
         text = "Upload your ID photo",
         color = placeholderTextColor
     )
 
-    Column(
-        modifier = Modifier
-            .dashedBorder(
-                width = 1.dp,
-                brush = Brush.horizontalGradient(
-                    listOf(
-                        placeholderTextColor,
-                        placeholderTextColor
-                    )
-                ),
-                shape = RoundedCornerShape(12.dp), on = 8.dp, off = 8.dp
-            )
-            .padding(all = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Box(
+
+    if (state.selectedImageByteArray == null) {
+
+        Column(
             modifier = Modifier
-                .background(color = outlinedTextFieldContainerColor, shape = CircleShape)
+                .border(1.dp, placeholderTextColor, shape = RoundedCornerShape(12.dp))
+                .padding(all = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Icon(
-                imageVector = vectorResource(Res.drawable.image_solid),
-                contentDescription = "",
+            Box(
                 modifier = Modifier
-                    .padding(12.dp)
-                    .size(24.dp)
+                    .background(color = outlinedTextFieldContainerColor, shape = CircleShape)
+            ) {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.image_solid),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .size(24.dp)
+                )
+            }
+
+            Text(
+                text = "Don't worry, your data won't be stored. It only will be used for verification",
+                textAlign = TextAlign.Center,
+                color = placeholderTextColor
             )
+
+            OutlinedButton(
+                onClick = { singleImagePicker.launch() },
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(text = "Submit")
+            }
         }
 
-        Text(
-            text = "Don't worry, your data won't be stored. It only will be used for verification",
-            textAlign = TextAlign.Center,
-            color = placeholderTextColor
-        )
-
-        OutlinedButton(
-            onClick = {/*Todo: pick photo*/ },
-            shape = RoundedCornerShape(12.dp)
+    } else {
+        Column(
+            modifier = Modifier
+                .border(1.dp, placeholderTextColor, shape = RoundedCornerShape(12.dp))
+                .padding(all = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "Submit")
+            AsyncImage(
+                modifier = Modifier.fillMaxSize(),
+                model = state.selectedImageByteArray,
+                contentDescription = "",
+                contentScale = ContentScale.Fit
+            )
+            HorizontalDivider(modifier = Modifier.weight(1f))
+            Row {
+                IconButton(onClick = { onEvent(SignUpEvents.OnRemoveImageSelected) }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = "",
+                        tint = placeholderTextColor
+                    )
+                }
+            }
         }
-
     }
+
 }
 
 @Composable
