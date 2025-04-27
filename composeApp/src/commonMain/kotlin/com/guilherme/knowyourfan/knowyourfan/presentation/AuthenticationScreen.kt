@@ -65,7 +65,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun AuthenticationScreen(
     onAuth: () -> Unit,
-    onSignUpClick: () -> Unit
+    onSignUpClick: () -> Unit,
 ) {
 
 

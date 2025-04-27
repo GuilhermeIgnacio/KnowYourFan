@@ -8,9 +8,5 @@ class KnowYourFanApplication: Application() {
     override fun onCreate() {
         super.onCreate()
 
-        initKoin{
-            androidContext(this@KnowYourFanApplication)
-        }
-
     }
 }

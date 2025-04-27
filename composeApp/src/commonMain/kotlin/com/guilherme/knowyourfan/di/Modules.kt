@@ -6,7 +6,7 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
-expect val platformModule: Module
+expect fun platformModule(activity: Any): Module
 
 val sharedModules = module {
     viewModel { AuthenticationViewModel(get()) }

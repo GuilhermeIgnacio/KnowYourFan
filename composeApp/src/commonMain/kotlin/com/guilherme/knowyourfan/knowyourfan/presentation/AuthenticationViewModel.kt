@@ -30,9 +30,7 @@ data class AuthenticationState(
 sealed interface AuthenticationEvents {
     data class OnEmailTextFieldValueChanged(val value: String) : AuthenticationEvents
     data class OnPasswordTextFieldValueChanged(val value: String) : AuthenticationEvents
-    data object OnSignInButtonClicked : AuthenticationEvents
-    data object OnSignInWithGoogleButtonClicked : AuthenticationEvents
-    data object OnSignInWithAppleButtonClicked : AuthenticationEvents
+    data object OnSignInWithXButtonClicked : AuthenticationEvents
 }
 
 class AuthenticationViewModel(
@@ -58,43 +56,10 @@ class AuthenticationViewModel(
                 }
             }
 
-            AuthenticationEvents.OnSignInButtonClicked -> {
-
-            }
-
-            AuthenticationEvents.OnSignInWithGoogleButtonClicked -> {
-
+            AuthenticationEvents.OnSignInWithXButtonClicked -> {
                 viewModelScope.launch {
-                    _state.update { it.copy(isLoading = true) }
-                    when (val result = firebaseAuthentication.authenticateWithGoogle()) {
-
-                        is Result.Success -> {
-                            _state.update { it.copy(isAuthenticated = true) }
-                        }
-
-                        is Result.Error -> {
-                            val errorMessage = when (result.error) {
-                                AuthenticationError.Authentication.GET_CREDENTIAL_EXCEPTION -> Res.string.get_credential_cancellation_exception_message
-                                AuthenticationError.Authentication.GET_CREDENTIAL_UNKNOWN -> Res.string.get_credential_unknown_exception_message
-                                AuthenticationError.Authentication.GET_CREDENTIAL_CANCELLATION -> Res.string.get_credential_cancellation_exception_message
-                                AuthenticationError.Authentication.GET_CREDENTIAL_INTERRUPTED -> Res.string.get_credential_interrupted_exception_message
-                                AuthenticationError.Authentication.FIREBASE_AUTH_INVALID_USER -> Res.string.firebase_auth_invalid_user_exception_message
-                                AuthenticationError.Authentication.FIREBASE_AUTH_INVALID_CREDENTIALS -> Res.string.firebase_auth_invalid_credentials_exception_message
-                                AuthenticationError.Authentication.FIREBASE_AUTH_USER_COLLISION -> Res.string.firebase_auth_user_collision_exception_message
-                                AuthenticationError.Authentication.UNKNOWN -> Res.string.unknown_error_occurred_message
-                            }
-
-                            _state.update { it.copy(errorMessage = errorMessage, isLoading = false) }
-
-                        }
-
-                        Result.Loading -> {}
-                    }
+                    firebaseAuthentication.authenticateWithX()
                 }
-            }
-
-            AuthenticationEvents.OnSignInWithAppleButtonClicked -> {
-
             }
 
         }

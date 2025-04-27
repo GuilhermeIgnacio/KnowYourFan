@@ -5,6 +5,6 @@ import com.guilherme.knowyourfan.domain.Result
 
 interface FirebaseAuthentication {
 
-    suspend fun authenticateWithGoogle(): Result<Unit, AuthenticationError.Authentication>
+    suspend fun authenticateWithX()
 
 }
