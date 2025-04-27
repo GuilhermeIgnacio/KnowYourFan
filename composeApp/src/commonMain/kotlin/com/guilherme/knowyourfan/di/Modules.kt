@@ -10,5 +10,5 @@ expect fun platformModule(activity: Any): Module
 
 val sharedModules = module {
     viewModel { AuthenticationViewModel(get()) }
-    viewModel { SignUpViewModel(get()) }
+    viewModel { SignUpViewModel(get(), get()) }
 }

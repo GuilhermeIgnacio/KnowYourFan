@@ -140,7 +140,7 @@ fun SignUpScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Max),
-            onClick = {/*Todo Sign In*/ },
+            onClick = {/*Todo Sign In*/onEvent(SignUpEvents.OnRegisterButtonClicked) },
 
             enabled = !state.usernameTextField.isNullOrEmpty()
                     && !state.emailTextField.isNullOrEmpty()
@@ -148,6 +148,7 @@ fun SignUpScreen(
                     && state.emailTextField!!.matches(emailRegex)
                     && !state.idTextField.isNullOrEmpty()
                     && state.idTextField!!.matches(cpfRegex)
+                    && state.selectedImageByteArray != null
                     && !state.passwordTextField.isNullOrEmpty()
                     && state.passwordTextField == state.confirmPasswordTextField,
 
