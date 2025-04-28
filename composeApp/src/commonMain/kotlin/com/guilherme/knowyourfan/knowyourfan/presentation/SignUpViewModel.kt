@@ -2,6 +2,9 @@ package com.guilherme.knowyourfan.knowyourfan.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.guilherme.knowyourfan.core.util.toBase64
+import com.guilherme.knowyourfan.domain.Result
+import com.guilherme.knowyourfan.knowyourfan.data.remote.api.OpenAiService
 import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseAuthentication
 import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseStorage
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +39,7 @@ sealed interface SignUpEvents {
 class SignUpViewModel(
     private val firebaseAuthentication: FirebaseAuthentication,
     private val firebaseStorage: FirebaseStorage,
+    private val openAiService: OpenAiService,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SignUpState())
@@ -131,11 +135,14 @@ class SignUpViewModel(
             SignUpEvents.OnRegisterButtonClicked -> {
                 viewModelScope.launch {
                     val imageByteArray = _state.value.selectedImageByteArray
+                    val idTextField = _state.value.idTextField
 
-                    if (imageByteArray != null) {
-                        firebaseStorage.uploadToStorage(imageByteArray)
-                    } //Todo: Trigger Error
+                    if (imageByteArray != null && !idTextField.isNullOrEmpty()) {
+                        openAiService.analyzeImage(imageByteArray.toBase64(), idTextField)
+                    }
+
                 }
+
             }
         }
     }

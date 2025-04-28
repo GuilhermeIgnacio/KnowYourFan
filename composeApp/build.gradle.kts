@@ -57,6 +57,14 @@ kotlin {
             implementation("io.insert-koin:koin-compose-viewmodel")
             implementation("io.insert-koin:koin-android")
 
+            //Ktor
+            val ktor_version= "3.1.2"
+            implementation("io.ktor:ktor-client-core:$ktor_version")
+            implementation("io.ktor:ktor-client-cio:$ktor_version")
+            implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+
+
             //Credential Manager
             implementation("androidx.credentials:credentials:1.5.0")
             implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
