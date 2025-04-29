@@ -1,4 +1,4 @@
-package com.guilherme.knowyourfan.knowyourfan.data.remote.api.openai.model
+package com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
