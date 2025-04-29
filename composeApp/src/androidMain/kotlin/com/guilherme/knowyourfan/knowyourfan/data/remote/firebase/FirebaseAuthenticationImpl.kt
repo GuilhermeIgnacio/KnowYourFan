@@ -1,45 +1,45 @@
 package com.guilherme.knowyourfan.knowyourfan.data.remote.firebase
 
-import android.content.Context
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.GetCredentialInterruptedException
 import androidx.credentials.exceptions.GetCredentialUnknownException
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.EmailAuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.OAuthProvider
-import com.google.firebase.auth.TwitterAuthCredential
-import com.google.firebase.auth.TwitterAuthProvider
-import com.guilherme.knowyourfan.MainActivity
+import com.google.firebase.firestore.FirebaseFirestore
 import com.guilherme.knowyourfan.domain.AuthenticationError
 import com.guilherme.knowyourfan.domain.Result
-import com.guilherme.knowyourfan.knowyourfan.presentation.theme.provider
 import kotlinx.coroutines.tasks.await
-import java.security.MessageDigest
-import java.util.UUID
 
 class FirebaseAuthenticationImpl(
     private val auth: FirebaseAuth,
+    private val db: FirebaseFirestore,
 ) : FirebaseAuthentication {
 
     override suspend fun signUpUser(
         email: String,
         password: String,
+        purchases: List<String>,
+        events: List<String>,
+        interestGames: List<String>,
     ): Result<Unit, AuthenticationError.Authentication> {
 
         return try {
 
-            auth.createUserWithEmailAndPassword(email, password).await()
+            val foo = auth.createUserWithEmailAndPassword(email, password).await()
+
+            val user = hashMapOf(
+                "purchases" to purchases,
+                "events" to events,
+                "interestGames" to interestGames
+            )
+
+            foo.user?.uid?.let { uid ->
+                db.collection("users").document(uid).set(user).await()
+            }
 
             Result.Success(Unit)
 

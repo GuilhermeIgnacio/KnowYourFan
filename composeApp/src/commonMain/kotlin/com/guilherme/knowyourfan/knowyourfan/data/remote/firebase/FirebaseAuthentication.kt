@@ -5,6 +5,12 @@ import com.guilherme.knowyourfan.domain.Result
 
 interface FirebaseAuthentication {
 
-    suspend fun signUpUser(email: String, password: String): Result<Unit, AuthenticationError.Authentication>
+    suspend fun signUpUser(
+        email: String,
+        password: String,
+        purchases: List<String>,
+        events: List<String>,
+        interestGames: List<String>,
+    ): Result<Unit, AuthenticationError.Authentication>
 
 }

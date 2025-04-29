@@ -8,7 +8,6 @@ import com.guilherme.knowyourfan.domain.AuthenticationError
 import com.guilherme.knowyourfan.domain.Result
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.GeminiService
 import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseAuthentication
-import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseStorage
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.client_request_exception
 import knowyourfan.composeapp.generated.resources.cpf_does_not_matches
@@ -81,7 +80,6 @@ sealed interface SignUpEvents {
 
 class SignUpViewModel(
     private val firebaseAuthentication: FirebaseAuthentication,
-    private val firebaseStorage: FirebaseStorage,
     private val geminiService: GeminiService,
 ) : ViewModel() {
 
@@ -194,12 +192,20 @@ class SignUpViewModel(
 
                                         val email = _state.value.emailTextField
                                         val password = _state.value.passwordTextField
+                                        val purchases = _state.value.lastYearPurchasesList.map { it.game }
+                                        val events = _state.value.eventsList.map { it.game }
+                                        val interestGames = _state.value.interestGamesList.map { it.game }
+
+
 
                                         if (!email.isNullOrEmpty() && !password.isNullOrEmpty()) {
                                             when (val authenticationResult =
                                                 firebaseAuthentication.signUpUser(
                                                     email = email,
-                                                    password = password
+                                                    password = password,
+                                                    purchases = purchases,
+                                                    events = events,
+                                                    interestGames = interestGames
                                                 )) {
                                                 is Result.Success -> {
                                                     _state.update { it.copy(isAuthenticated = true) }

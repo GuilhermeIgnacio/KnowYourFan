@@ -13,5 +13,5 @@ expect fun platformModule(activity: Any): Module
 val sharedModules = module {
     single<GeminiService> { GeminiImpl() }
     viewModel { AuthenticationViewModel(get()) }
-    viewModel { SignUpViewModel(get(), get(), get()) }
+    viewModel { SignUpViewModel(get(), get()) }
 }

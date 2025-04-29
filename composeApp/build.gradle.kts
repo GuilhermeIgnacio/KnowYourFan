@@ -49,7 +49,7 @@ kotlin {
             //Firebase
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation("com.google.firebase:firebase-auth")
-            implementation("com.google.firebase:firebase-storage")
+            implementation("com.google.firebase:firebase-firestore")
 
             //Koin
             implementation(project.dependencies.platform(libs.koin.bom))
