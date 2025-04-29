@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
@@ -68,7 +69,6 @@ fun AuthenticationScreen(
     onSignUpClick: () -> Unit,
 ) {
 
-
     val viewModel = koinViewModel<AuthenticationViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val onEvent = viewModel::onEvent
@@ -92,7 +92,22 @@ fun AuthenticationScreen(
     }
 
     val interactionSource = remember { MutableInteractionSource() }
+
+    val outlinedTextFieldContainerColor = Color(0xFF1E1E1E)
+    val indicatorColor = Color.Transparent
+    val iconsColor = Color(0xFF606060)
     val placeholderTextColor = Color(0xFF515151)
+
+    val outlinedTextFieldColors = OutlinedTextFieldDefaults.colors().copy(
+        unfocusedContainerColor = outlinedTextFieldContainerColor,
+        focusedContainerColor = outlinedTextFieldContainerColor,
+        unfocusedIndicatorColor = indicatorColor,
+        focusedIndicatorColor = indicatorColor,
+        focusedPlaceholderColor = placeholderTextColor,
+        unfocusedPlaceholderColor = placeholderTextColor,
+        cursorColor = placeholderTextColor,
+        errorCursorColor = placeholderTextColor,
+    )
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
@@ -115,27 +130,71 @@ fun AuthenticationScreen(
 
             Headers(placeholderTextColor)
 
+            Column(
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = state.emailTextField ?: "",
+                    onValueChange = { onEvent(AuthenticationEvents.OnEmailTextFieldValueChanged(it)) },
+                    placeholder = { Text(text = "Email") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Outlined.Email,
+                            contentDescription = "",
+                            tint = iconsColor
+                        )
+                    },
+                    maxLines = 1,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = outlinedTextFieldColors,
+                )
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    value = state.passwordTextField ?: "",
+                    onValueChange = {
+                        onEvent(
+                            AuthenticationEvents.OnPasswordTextFieldValueChanged(
+                                it
+                            )
+                        )
+                    },
+                    placeholder = { Text(text = "Password") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Outlined.Lock,
+                            contentDescription = "",
+                            tint = iconsColor
+                        )
+                    },
+                    trailingIcon = {},
+                    maxLines = 1,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = outlinedTextFieldColors,
+                )
+            }
+
+
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(IntrinsicSize.Max),
-                onClick = {/*Todo Sign In*/ },
+                onClick = { onEvent(AuthenticationEvents.OnSignInButtonClicked) },
+
+                enabled = !state.emailTextField.isNullOrEmpty() && !state.passwordTextField.isNullOrEmpty(),
+
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors().copy(
                     contentColor = Color.Black,
                     containerColor = Color.White,
                 )
             ) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    imageVector = vectorResource(Res.drawable.x_twitter_brands),
-                    contentDescription = "",
-                    tint = Color.Black
-                )
-
-                Spacer(Modifier.width(12.dp))
-
-                Text(text = "Sign In With X")
+                Text(text = "Sign In")
             }
 
             CreateAccountText(

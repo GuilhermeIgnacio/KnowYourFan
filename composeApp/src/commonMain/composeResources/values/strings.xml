@@ -9,6 +9,7 @@
     <string name="firebase_auth_invalid_credentials_exception_message">Invalid Credentials</string>
     <string name="firebase_auth_user_collision_exception_message">An account with this email address already exists, please trya different one.</string>
     <string name="firebase_auth_weak_password_exception_message">The password is too weak. Please use a stronger password</string>
+    <string name="firebase_auth_too_many_requestes_exception_message">Too many login attempts. Please wait a moment and try again.</string>
 
     <string name="serialization_exception">Failed to process data. Please check your input and try again.</string>
     <string name="redirect_response_exception">The request was redirected unexpectedly. Please try again later.</string>
@@ -17,5 +18,9 @@
     <string name="unresolved_address_exception">Unable to connect to the server. Please check your network connection.</string>
 
     <string name="cpf_does_not_matches">CPF does not matches with identity photo</string>
+
+    <string name="sign_in_invalid_credentials_message">Incorrect email or password. Please try again.</string>
+    <string name="password_empty_field_error_message">The password field should not be empty</string>
+    <string name="invalid_email_error_message">Invalid Email. Please provide a valid email.</string>
 
 </resources>

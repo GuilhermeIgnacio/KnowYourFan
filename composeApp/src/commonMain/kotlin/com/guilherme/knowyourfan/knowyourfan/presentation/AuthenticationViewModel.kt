@@ -8,10 +8,14 @@ import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseAuthen
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.firebase_auth_invalid_credentials_exception_message
 import knowyourfan.composeapp.generated.resources.firebase_auth_invalid_user_exception_message
+import knowyourfan.composeapp.generated.resources.firebase_auth_too_many_requestes_exception_message
 import knowyourfan.composeapp.generated.resources.firebase_auth_user_collision_exception_message
 import knowyourfan.composeapp.generated.resources.get_credential_cancellation_exception_message
 import knowyourfan.composeapp.generated.resources.get_credential_interrupted_exception_message
 import knowyourfan.composeapp.generated.resources.get_credential_unknown_exception_message
+import knowyourfan.composeapp.generated.resources.invalid_email_error_message
+import knowyourfan.composeapp.generated.resources.password_empty_field_error_message
+import knowyourfan.composeapp.generated.resources.sign_in_invalid_credentials_message
 import knowyourfan.composeapp.generated.resources.unknown_error_occurred_message
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,12 +28,13 @@ data class AuthenticationState(
     val passwordTextField: String? = null,
     val isLoading: Boolean = false,
     val errorMessage: StringResource? = null,
-    val isAuthenticated: Boolean = false
+    val isAuthenticated: Boolean = false,
 )
 
 sealed interface AuthenticationEvents {
     data class OnEmailTextFieldValueChanged(val value: String) : AuthenticationEvents
     data class OnPasswordTextFieldValueChanged(val value: String) : AuthenticationEvents
+    data object OnSignInButtonClicked : AuthenticationEvents
 }
 
 class AuthenticationViewModel(
@@ -55,6 +60,49 @@ class AuthenticationViewModel(
                 }
             }
 
+            AuthenticationEvents.OnSignInButtonClicked -> {
+                viewModelScope.launch {
+
+                    val email = _state.value.emailTextField
+                    val password = _state.value.passwordTextField
+
+                    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$".toRegex()
+
+                    if (!email.isNullOrEmpty() && email.matches(emailRegex) && !password.isNullOrEmpty()) {
+                        _state.update { it.copy(isLoading = true) }
+
+
+                        when (val result = firebaseAuthentication.signInUser(email, password)) {
+                            is Result.Success -> {
+                                _state.update { it.copy(isAuthenticated = true) }
+                            }
+                            is Result.Error -> {
+                                val errorMessage = when(result.error) {
+                                    AuthenticationError.SignIn.USER_NOT_FOUND -> Res.string.firebase_auth_user_collision_exception_message
+                                    AuthenticationError.SignIn.INVALID_CREDENTIALS -> Res.string.sign_in_invalid_credentials_message
+                                    AuthenticationError.SignIn.TOO_MANY_REQUESTS -> Res.string.firebase_auth_too_many_requestes_exception_message
+                                    AuthenticationError.SignIn.UNKNOWN -> Res.string.unknown_error_occurred_message
+                                }
+
+                                _state.update { it.copy(errorMessage = errorMessage) }
+
+                            }
+                            Result.Loading -> {}
+                        }
+
+
+                    } else {
+                        if (password.isNullOrEmpty()) {
+                            _state.update { it.copy(errorMessage = Res.string.password_empty_field_error_message) }
+                        }
+                        if (!email.isNullOrEmpty() && !email.matches(emailRegex)) {
+                            _state.update { it.copy(errorMessage = Res.string.invalid_email_error_message) }
+                        }
+                    }
+
+                    _state.update { it.copy(isLoading = false) }
+                }
+            }
         }
     }
 

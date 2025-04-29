@@ -214,15 +214,15 @@ class SignUpViewModel(
                                                 is Result.Error -> {
                                                     val errorMessage =
                                                         when (authenticationResult.error) {
-                                                            AuthenticationError.Authentication.GET_CREDENTIAL_EXCEPTION -> Res.string.get_credential_unknown_exception_message
-                                                            AuthenticationError.Authentication.GET_CREDENTIAL_UNKNOWN -> Res.string.get_credential_unknown_exception_message
-                                                            AuthenticationError.Authentication.GET_CREDENTIAL_CANCELLATION -> Res.string.get_credential_cancellation_exception_message
-                                                            AuthenticationError.Authentication.GET_CREDENTIAL_INTERRUPTED -> Res.string.get_credential_interrupted_exception_message
-                                                            AuthenticationError.Authentication.FIREBASE_AUTH_INVALID_USER -> Res.string.firebase_auth_invalid_user_exception_message
-                                                            AuthenticationError.Authentication.FIREBASE_AUTH_INVALID_CREDENTIALS -> Res.string.firebase_auth_invalid_credentials_exception_message
-                                                            AuthenticationError.Authentication.FIREBASE_AUTH_USER_COLLISION -> Res.string.firebase_auth_user_collision_exception_message
-                                                            AuthenticationError.Authentication.FIREBASE_AUTH_WEAK_PASSWORD -> Res.string.firebase_auth_weak_password_exception_message
-                                                            AuthenticationError.Authentication.UNKNOWN -> Res.string.unknown_error_occurred_message
+                                                            AuthenticationError.SignUp.GET_CREDENTIAL_EXCEPTION -> Res.string.get_credential_unknown_exception_message
+                                                            AuthenticationError.SignUp.GET_CREDENTIAL_UNKNOWN -> Res.string.get_credential_unknown_exception_message
+                                                            AuthenticationError.SignUp.GET_CREDENTIAL_CANCELLATION -> Res.string.get_credential_cancellation_exception_message
+                                                            AuthenticationError.SignUp.GET_CREDENTIAL_INTERRUPTED -> Res.string.get_credential_interrupted_exception_message
+                                                            AuthenticationError.SignUp.FIREBASE_AUTH_INVALID_USER -> Res.string.firebase_auth_invalid_user_exception_message
+                                                            AuthenticationError.SignUp.FIREBASE_AUTH_INVALID_CREDENTIALS -> Res.string.firebase_auth_invalid_credentials_exception_message
+                                                            AuthenticationError.SignUp.FIREBASE_AUTH_USER_COLLISION -> Res.string.firebase_auth_user_collision_exception_message
+                                                            AuthenticationError.SignUp.FIREBASE_AUTH_WEAK_PASSWORD -> Res.string.firebase_auth_weak_password_exception_message
+                                                            AuthenticationError.SignUp.UNKNOWN -> Res.string.unknown_error_occurred_message
                                                         }
 
                                                     _state.update {

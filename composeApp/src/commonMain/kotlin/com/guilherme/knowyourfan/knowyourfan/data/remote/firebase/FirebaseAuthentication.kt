@@ -11,6 +11,8 @@ interface FirebaseAuthentication {
         purchases: List<String>,
         events: List<String>,
         interestGames: List<String>,
-    ): Result<Unit, AuthenticationError.Authentication>
+    ): Result<Unit, AuthenticationError.SignUp>
+
+    suspend fun signInUser(email: String, password: String): Result<Unit, AuthenticationError.SignIn>
 
 }
