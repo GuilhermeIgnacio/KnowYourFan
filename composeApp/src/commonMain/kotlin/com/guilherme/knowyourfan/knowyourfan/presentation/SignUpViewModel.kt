@@ -33,12 +33,22 @@ import org.jetbrains.compose.resources.StringResource
 data class SignUpState(
     val usernameTextField: String? = null,
     val emailTextField: String? = null,
+
     val confirmEmailTextField: String? = null,
     val idTextField: String? = null,
+
     val passwordTextField: String? = null,
     val confirmPasswordTextField: String? = null,
+
+    val lastYearPurchasesTextField: String? = null,
+    val eventsTextField: String? = null,
+
     val interestGamesList: List<ChipItem> = emptyList(),
+    val lastYearPurchasesList: List<ChipItem> = emptyList(),
+    val eventsList: List<ChipItem> = emptyList(),
+
     val selectedImageByteArray: ByteArray? = null,
+
     val isLoading: Boolean = false,
     val errorMessage: StringResource? = null,
     val isAuthenticated: Boolean = false,
@@ -46,14 +56,26 @@ data class SignUpState(
 
 sealed interface SignUpEvents {
     data class OnUsernameTextFieldValueChanged(val value: String) : SignUpEvents
+
     data class OnEmailTextFieldValueChanged(val value: String) : SignUpEvents
     data class OnConfirmEmailTextFieldValueChanged(val value: String) : SignUpEvents
-    data class OnIdTextFieldValueChanged(val value: String) : SignUpEvents
+
     data class OnPasswordTextFieldValueChanged(val value: String) : SignUpEvents
     data class OnConfirmPasswordTextFieldValueChanged(val value: String) : SignUpEvents
+
+    data class OnIdTextFieldValueChanged(val value: String) : SignUpEvents
+
+    data class OnLastYearPurchasesTextFieldValueChanged(val value: String) : SignUpEvents
+    data class OnLastYearPurchaseChipClicked(val value: ChipItem) : SignUpEvents
+
+    data class OnEventsTextFieldValueChanged(val value: String) : SignUpEvents
+    data class OnEventChipClicked(val value: ChipItem) : SignUpEvents
+
     data class OnGameChipClicked(val value: ChipItem) : SignUpEvents
+
     data class OnImageSelected(val value: ByteArray) : SignUpEvents
     data object OnRemoveImageSelected : SignUpEvents
+
     data object OnRegisterButtonClicked : SignUpEvents
 }
 
@@ -245,6 +267,56 @@ class SignUpViewModel(
 
                 }
 
+            }
+
+            is SignUpEvents.OnLastYearPurchasesTextFieldValueChanged -> {
+                if (event.value.contains(",")) {
+
+                    val chipItem = ChipItem(
+                        game = event.value.replace(",", ""),
+                        onClick = {},
+                        icon = null
+                    )
+
+                    val list = _state.value.lastYearPurchasesList.toMutableList()
+                    list.add(chipItem)
+
+                    _state.update { it.copy(lastYearPurchasesList = list, lastYearPurchasesTextField = null) }
+
+                } else {
+                    _state.update { it.copy(lastYearPurchasesTextField = event.value) }
+                }
+            }
+
+            is SignUpEvents.OnLastYearPurchaseChipClicked -> {
+                val list = _state.value.lastYearPurchasesList.toMutableList()
+                list.remove(event.value)
+                _state.update { it.copy(lastYearPurchasesList = list) }
+            }
+
+            is SignUpEvents.OnEventsTextFieldValueChanged -> {
+                if (event.value.contains(",")) {
+
+                    val chipItem = ChipItem(
+                        game = event.value.replace(",", ""),
+                        onClick = {},
+                        icon = null
+                    )
+
+                    val list = _state.value.eventsList.toMutableList()
+                    list.add(chipItem)
+
+                    _state.update { it.copy(eventsList = list, eventsTextField = null) }
+
+                } else {
+                    _state.update { it.copy(eventsTextField = event.value) }
+                }
+            }
+
+            is SignUpEvents.OnEventChipClicked -> {
+                val list = _state.value.eventsList.toMutableList()
+                list.remove(event.value)
+                _state.update { it.copy(eventsList = list) }
             }
         }
     }

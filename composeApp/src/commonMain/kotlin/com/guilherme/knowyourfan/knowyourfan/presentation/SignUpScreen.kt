@@ -24,10 +24,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
@@ -69,6 +71,7 @@ import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.address_card_regular
+import knowyourfan.composeapp.generated.resources.calendar_regular
 import knowyourfan.composeapp.generated.resources.furia_logo
 import knowyourfan.composeapp.generated.resources.image_solid
 import org.jetbrains.compose.resources.getString
@@ -79,7 +82,7 @@ import org.jetbrains.compose.resources.vectorResource
 @Composable
 fun SignUpScreen(
     viewModel: SignUpViewModel,
-    onAccountCreated: () -> Unit
+    onAccountCreated: () -> Unit,
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -107,7 +110,10 @@ fun SignUpScreen(
         state.errorMessage?.let {
             val result = snackBarHostState.showSnackbar(message = getString(it))
             when (result) {
-                SnackbarResult.Dismissed -> { viewModel.clearSnackBar() }
+                SnackbarResult.Dismissed -> {
+                    viewModel.clearSnackBar()
+                }
+
                 SnackbarResult.ActionPerformed -> {}
             }
 
@@ -367,6 +373,7 @@ private fun IdSection(
 
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TextFields(
     iconsColor: Color,
@@ -486,6 +493,103 @@ private fun TextFields(
         shape = RoundedCornerShape(12.dp),
         colors = outlinedTextFieldColors,
     )
+
+    //Last year purchases section
+
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth(),
+        value = state.lastYearPurchasesTextField ?: "",
+        onValueChange = { onEvent(SignUpEvents.OnLastYearPurchasesTextFieldValueChanged(it)) },
+        placeholder = { Text(text = "List your purchases from the past year (separate with commas)") },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Outlined.ShoppingCart,
+                contentDescription = "",
+                tint = iconsColor
+            )
+        },
+        maxLines = 2,
+        minLines = 2,
+        shape = RoundedCornerShape(12.dp),
+        colors = outlinedTextFieldColors,
+    )
+
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+
+        state.lastYearPurchasesList.forEach {
+            FilterChip(
+                onClick = { onEvent(SignUpEvents.OnLastYearPurchaseChipClicked(it)) },
+                label = {
+                    Text(text = it.game)
+                },
+                shape = RoundedCornerShape(100),
+                selected = true,
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Clear,
+                        contentDescription = "Clear Icon",
+                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                    )
+                }
+            )
+        }
+
+    }
+
+    //Last year purchases section
+
+
+    //Events Section
+
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth(),
+        value = state.eventsTextField ?: "",
+        onValueChange = { onEvent(SignUpEvents.OnEventsTextFieldValueChanged(it)) },
+        placeholder = { Text(text = "List events you participated(separate with commas)") },
+        leadingIcon = {
+            Icon(
+                modifier = Modifier.size(24.dp),
+                imageVector = vectorResource(Res.drawable.calendar_regular),
+                contentDescription = "",
+                tint = iconsColor
+            )
+        },
+        maxLines = 2,
+        minLines = 2,
+        shape = RoundedCornerShape(12.dp),
+        colors = outlinedTextFieldColors,
+    )
+
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+
+        state.eventsList.forEach {
+            FilterChip(
+                onClick = { onEvent(SignUpEvents.OnEventChipClicked(it)) },
+                label = {
+                    Text(text = it.game)
+                },
+                shape = RoundedCornerShape(100),
+                selected = true,
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.Clear,
+                        contentDescription = "Clear Icon",
+                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                    )
+                }
+            )
+        }
+
+    }
+
+    //Events Section
+
 }
 
 data class ChipItem(
