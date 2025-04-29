@@ -11,6 +11,7 @@ import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseAuthen
 import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseStorage
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.client_request_exception
+import knowyourfan.composeapp.generated.resources.cpf_does_not_matches
 import knowyourfan.composeapp.generated.resources.firebase_auth_invalid_credentials_exception_message
 import knowyourfan.composeapp.generated.resources.firebase_auth_invalid_user_exception_message
 import knowyourfan.composeapp.generated.resources.firebase_auth_user_collision_exception_message
@@ -210,7 +211,7 @@ class SignUpViewModel(
                                         }
 
                                     } else if (response.contains("false", ignoreCase = true)) {
-                                        TODO("Display error message")
+                                        _state.update { it.copy(errorMessage = Res.string.cpf_does_not_matches) }
                                     }
                                 }
 

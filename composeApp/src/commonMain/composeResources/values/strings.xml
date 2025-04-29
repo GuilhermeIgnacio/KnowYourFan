@@ -15,4 +15,7 @@
     <string name="client_request_exception">There was an issue with the request. Please verify your input and try again.</string>
     <string name="server_response_exception">The server encountered an error. Please try again later.</string>
     <string name="unresolved_address_exception">Unable to connect to the server. Please check your network connection.</string>
+
+    <string name="cpf_does_not_matches">CPF does not matches with identity photo</string>
+
 </resources>
