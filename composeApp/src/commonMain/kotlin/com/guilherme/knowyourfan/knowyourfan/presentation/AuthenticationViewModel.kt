@@ -30,7 +30,6 @@ data class AuthenticationState(
 sealed interface AuthenticationEvents {
     data class OnEmailTextFieldValueChanged(val value: String) : AuthenticationEvents
     data class OnPasswordTextFieldValueChanged(val value: String) : AuthenticationEvents
-    data object OnSignInWithXButtonClicked : AuthenticationEvents
 }
 
 class AuthenticationViewModel(
@@ -53,12 +52,6 @@ class AuthenticationViewModel(
                     it.copy(
                         passwordTextField = event.value
                     )
-                }
-            }
-
-            AuthenticationEvents.OnSignInWithXButtonClicked -> {
-                viewModelScope.launch {
-                    firebaseAuthentication.authenticateWithX()
                 }
             }
 

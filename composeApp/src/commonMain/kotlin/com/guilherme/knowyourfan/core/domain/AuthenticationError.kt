@@ -9,6 +9,7 @@ sealed interface AuthenticationError: Error {
         FIREBASE_AUTH_INVALID_USER,
         FIREBASE_AUTH_INVALID_CREDENTIALS,
         FIREBASE_AUTH_USER_COLLISION,
+        FIREBASE_AUTH_WEAK_PASSWORD,
         UNKNOWN
     }
 

@@ -5,6 +5,6 @@ import com.guilherme.knowyourfan.domain.Result
 
 interface FirebaseAuthentication {
 
-    suspend fun authenticateWithX()
+    suspend fun signUpUser(email: String, password: String): Result<Unit, AuthenticationError.Authentication>
 
 }

@@ -38,10 +38,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,19 +64,22 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.guilherme.knowyourfan.core.presentation.CpfVisualTransformation
 import com.guilherme.knowyourfan.core.presentation.dashedBorder
+import com.guilherme.knowyourfan.knowyourfan.presentation.composables.LoadingIcon
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.address_card_regular
 import knowyourfan.composeapp.generated.resources.furia_logo
 import knowyourfan.composeapp.generated.resources.image_solid
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.imageResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SignUpScreen(
     viewModel: SignUpViewModel,
+    onAccountCreated: () -> Unit
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -92,77 +101,103 @@ fun SignUpScreen(
         errorCursorColor = placeholderTextColor,
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 8.dp)
-            .statusBarsPadding()
-            .navigationBarsPadding(),
-        verticalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
+    val snackBarHostState = remember { SnackbarHostState() }
 
-        Image(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .size(48.dp),
-            bitmap = imageResource(Res.drawable.furia_logo),
-            contentDescription = ""
-        )
+    LaunchedEffect(state.errorMessage) {
+        state.errorMessage?.let {
+            val result = snackBarHostState.showSnackbar(message = getString(it))
+            when (result) {
+                SnackbarResult.Dismissed -> { viewModel.clearSnackBar() }
+                SnackbarResult.ActionPerformed -> {}
+            }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        TextFields(
-            iconsColor = iconsColor,
-            outlinedTextFieldColors = outlinedTextFieldColors,
-            state = state,
-            onEvent = onEvent
-        )
-
-        IdSection(
-            placeholderTextColor = placeholderTextColor,
-            outlinedTextFieldContainerColor = outlinedTextFieldContainerColor,
-            state = state,
-            onEvent = onEvent
-        )
-
-        InterestGamesSection(
-            placeholderTextColor = placeholderTextColor,
-            onChipClicked = {
-                onEvent(SignUpEvents.OnGameChipClicked(it))
-            },
-            interestGamesList = state.interestGamesList
-        )
-
-        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$".toRegex()
-        val cpfRegex = Regex("""^(\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$""")
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Max),
-            onClick = { onEvent(SignUpEvents.OnRegisterButtonClicked) },
-
-            enabled = !state.usernameTextField.isNullOrEmpty()
-                    && !state.emailTextField.isNullOrEmpty()
-                    && state.emailTextField == state.confirmEmailTextField
-                    && state.emailTextField!!.matches(emailRegex)
-                    && !state.idTextField.isNullOrEmpty()
-                    && state.idTextField!!.matches(cpfRegex)
-                    && state.selectedImageByteArray != null
-                    && !state.passwordTextField.isNullOrEmpty()
-                    && state.passwordTextField == state.confirmPasswordTextField,
-
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors().copy(
-                contentColor = Color.Black,
-                containerColor = Color.White,
-            )
-        ) {
-            Text(text = "Register")
         }
-
-
     }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 8.dp)
+                .statusBarsPadding()
+                .navigationBarsPadding(),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+
+            Image(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .size(48.dp),
+                bitmap = imageResource(Res.drawable.furia_logo),
+                contentDescription = ""
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            TextFields(
+                iconsColor = iconsColor,
+                outlinedTextFieldColors = outlinedTextFieldColors,
+                state = state,
+                onEvent = onEvent
+            )
+
+            IdSection(
+                placeholderTextColor = placeholderTextColor,
+                outlinedTextFieldContainerColor = outlinedTextFieldContainerColor,
+                state = state,
+                onEvent = onEvent
+            )
+
+            InterestGamesSection(
+                placeholderTextColor = placeholderTextColor,
+                onChipClicked = {
+                    onEvent(SignUpEvents.OnGameChipClicked(it))
+                },
+                interestGamesList = state.interestGamesList
+            )
+
+            val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$".toRegex()
+            val cpfRegex = Regex("""^(\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$""")
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Max),
+                onClick = { onEvent(SignUpEvents.OnRegisterButtonClicked) },
+
+                enabled = !state.usernameTextField.isNullOrEmpty()
+                        && !state.emailTextField.isNullOrEmpty()
+                        && state.emailTextField == state.confirmEmailTextField
+                        && state.emailTextField!!.matches(emailRegex)
+                        && !state.idTextField.isNullOrEmpty()
+                        && state.idTextField!!.matches(cpfRegex)
+                        && state.selectedImageByteArray != null
+                        && !state.passwordTextField.isNullOrEmpty()
+                        && state.passwordTextField == state.confirmPasswordTextField,
+
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors().copy(
+                    contentColor = Color.Black,
+                    containerColor = Color.White,
+                )
+            ) {
+                Text(text = "Register")
+            }
+
+
+        }
+    }
+
+    if (state.isLoading) {
+        LoadingIcon()
+    }
+
+    if (state.isAuthenticated) {
+        onAccountCreated()
+    }
+
 }
 
 @Composable

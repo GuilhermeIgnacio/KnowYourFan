@@ -8,6 +8,7 @@
     <string name="firebase_auth_invalid_user_exception_message">Invalid User</string>
     <string name="firebase_auth_invalid_credentials_exception_message">Invalid Credentials</string>
     <string name="firebase_auth_user_collision_exception_message">An account with this email address already exists, please trya different one.</string>
+    <string name="firebase_auth_weak_password_exception_message">The password is too weak. Please use a stronger password</string>
 
     <string name="serialization_exception">Failed to process data. Please check your input and try again.</string>
     <string name="redirect_response_exception">The request was redirected unexpectedly. Please try again later.</string>

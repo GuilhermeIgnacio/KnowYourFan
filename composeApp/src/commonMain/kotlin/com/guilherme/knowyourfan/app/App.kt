@@ -32,7 +32,10 @@ fun App() {
 
                 composable<Route.SignUpScreen> {
                     val signUpViewModel = koinViewModel<SignUpViewModel>()
-                    SignUpScreen(viewModel = signUpViewModel)
+                    SignUpScreen(
+                        viewModel = signUpViewModel,
+                        onAccountCreated = { navController.navigate(Route.HomeGraph) }
+                    )
                 }
 
             }

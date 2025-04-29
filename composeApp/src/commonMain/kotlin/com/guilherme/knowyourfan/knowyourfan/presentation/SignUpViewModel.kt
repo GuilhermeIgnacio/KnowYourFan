@@ -4,12 +4,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.guilherme.knowyourfan.core.domain.GeminiError
 import com.guilherme.knowyourfan.core.util.toBase64
+import com.guilherme.knowyourfan.domain.AuthenticationError
 import com.guilherme.knowyourfan.domain.Result
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.GeminiService
 import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseAuthentication
 import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseStorage
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.client_request_exception
+import knowyourfan.composeapp.generated.resources.firebase_auth_invalid_credentials_exception_message
+import knowyourfan.composeapp.generated.resources.firebase_auth_invalid_user_exception_message
+import knowyourfan.composeapp.generated.resources.firebase_auth_user_collision_exception_message
+import knowyourfan.composeapp.generated.resources.firebase_auth_weak_password_exception_message
+import knowyourfan.composeapp.generated.resources.get_credential_cancellation_exception_message
+import knowyourfan.composeapp.generated.resources.get_credential_interrupted_exception_message
+import knowyourfan.composeapp.generated.resources.get_credential_unknown_exception_message
 import knowyourfan.composeapp.generated.resources.redirect_response_exception
 import knowyourfan.composeapp.generated.resources.serialization_exception
 import knowyourfan.composeapp.generated.resources.server_response_exception
@@ -32,6 +40,7 @@ data class SignUpState(
     val selectedImageByteArray: ByteArray? = null,
     val isLoading: Boolean = false,
     val errorMessage: StringResource? = null,
+    val isAuthenticated: Boolean = false,
 )
 
 sealed interface SignUpEvents {
@@ -159,7 +168,47 @@ class SignUpViewModel(
                                 val response = result.data
                                 if (!response.isNullOrEmpty()) {
                                     if (response.contains("true", ignoreCase = true)) {
-                                        TODO("Create User Account")
+
+                                        val email = _state.value.emailTextField
+                                        val password = _state.value.passwordTextField
+
+                                        if (!email.isNullOrEmpty() && !password.isNullOrEmpty()) {
+                                            when (val authenticationResult =
+                                                firebaseAuthentication.signUpUser(
+                                                    email = email,
+                                                    password = password
+                                                )) {
+                                                is Result.Success -> {
+                                                    _state.update { it.copy(isAuthenticated = true) }
+                                                }
+
+                                                is Result.Error -> {
+                                                    val errorMessage =
+                                                        when (authenticationResult.error) {
+                                                            AuthenticationError.Authentication.GET_CREDENTIAL_EXCEPTION -> Res.string.get_credential_unknown_exception_message
+                                                            AuthenticationError.Authentication.GET_CREDENTIAL_UNKNOWN -> Res.string.get_credential_unknown_exception_message
+                                                            AuthenticationError.Authentication.GET_CREDENTIAL_CANCELLATION -> Res.string.get_credential_cancellation_exception_message
+                                                            AuthenticationError.Authentication.GET_CREDENTIAL_INTERRUPTED -> Res.string.get_credential_interrupted_exception_message
+                                                            AuthenticationError.Authentication.FIREBASE_AUTH_INVALID_USER -> Res.string.firebase_auth_invalid_user_exception_message
+                                                            AuthenticationError.Authentication.FIREBASE_AUTH_INVALID_CREDENTIALS -> Res.string.firebase_auth_invalid_credentials_exception_message
+                                                            AuthenticationError.Authentication.FIREBASE_AUTH_USER_COLLISION -> Res.string.firebase_auth_user_collision_exception_message
+                                                            AuthenticationError.Authentication.FIREBASE_AUTH_WEAK_PASSWORD -> Res.string.firebase_auth_weak_password_exception_message
+                                                            AuthenticationError.Authentication.UNKNOWN -> Res.string.unknown_error_occurred_message
+                                                        }
+
+                                                    _state.update {
+                                                        it.copy(
+                                                            isLoading = false,
+                                                            errorMessage = errorMessage
+                                                        )
+                                                    }
+
+                                                }
+
+                                                Result.Loading -> TODO()
+                                            }
+                                        }
+
                                     } else if (response.contains("false", ignoreCase = true)) {
                                         TODO("Display error message")
                                     }
@@ -197,6 +246,10 @@ class SignUpViewModel(
 
             }
         }
+    }
+
+    fun clearSnackBar() {
+        _state.update { it.copy(errorMessage = null) }
     }
 
 }

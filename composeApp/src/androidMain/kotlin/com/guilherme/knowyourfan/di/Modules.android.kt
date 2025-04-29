@@ -1,6 +1,7 @@
 package com.guilherme.knowyourfan.di
 
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storage
@@ -17,11 +18,10 @@ actual fun platformModule(activity: Any): Module = module {
         Firebase.storage
     }
 
+    single<FirebaseAuth> { Firebase.auth }
+
     single<FirebaseAuthentication> {
-        FirebaseAuthenticationImpl(
-            auth = Firebase.auth,
-            activity = activity as MainActivity
-        )
+        FirebaseAuthenticationImpl(auth = get())
     }
 
     single<com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseStorage> {
