@@ -18,4 +18,6 @@ interface FirebaseAuthentication {
 
     suspend fun isAccountLinkedToX(): Result<Boolean, UserCheckError.User>
 
+    suspend fun linkAccountToX()
+
 }

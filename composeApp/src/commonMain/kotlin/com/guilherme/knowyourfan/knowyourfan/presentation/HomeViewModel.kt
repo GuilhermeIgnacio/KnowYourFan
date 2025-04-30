@@ -24,7 +24,7 @@ class HomeViewModel(
     private val _state = MutableStateFlow(HomeState())
     val state = _state.asStateFlow()
 
-    init {
+    /*init {
         viewModelScope.launch {
             when (val result = firebaseAuthentication.isAccountLinkedToX()) {
                 is Result.Success -> {
@@ -35,12 +35,14 @@ class HomeViewModel(
                 Result.Loading -> {}
             }
         }
-    }
+    }*/
 
     fun onEvent(event: HomeEvents) {
-        when(event) {
+        when (event) {
             HomeEvents.OnLinkWithXButtonClicked -> {
-
+                viewModelScope.launch {
+                    firebaseAuthentication.linkAccountToX()
+                }
             }
         }
     }

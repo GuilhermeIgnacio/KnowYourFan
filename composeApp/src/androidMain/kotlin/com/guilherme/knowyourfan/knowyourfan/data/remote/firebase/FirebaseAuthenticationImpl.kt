@@ -11,8 +11,11 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.OAuthProvider
+import com.google.firebase.auth.TwitterAuthProvider
 import com.google.firebase.auth.UserInfo
 import com.google.firebase.firestore.FirebaseFirestore
+import com.guilherme.knowyourfan.MainActivity
 import com.guilherme.knowyourfan.core.domain.UserCheckError
 import com.guilherme.knowyourfan.domain.AuthenticationError
 import com.guilherme.knowyourfan.domain.Result
@@ -22,6 +25,7 @@ import kotlin.contracts.Returns
 class FirebaseAuthenticationImpl(
     private val auth: FirebaseAuth,
     private val db: FirebaseFirestore,
+    val activity: MainActivity,
 ) : FirebaseAuthentication {
 
     override suspend fun signUpUser(
@@ -100,6 +104,25 @@ class FirebaseAuthenticationImpl(
         } else {
             Result.Error(UserCheckError.User.NULL_USER)
         }
+
+    }
+
+    override suspend fun linkAccountToX() {
+        val provider = OAuthProvider.newBuilder("twitter.com")
+        val currentUser = auth.currentUser
+
+        if (currentUser != null) {
+            val foo = auth.startActivityForSignInWithProvider(activity, provider.build())
+                .addOnSuccessListener {
+
+                    val credential = it.credential
+
+                    if (credential != null) {
+                        currentUser.linkWithCredential(credential)
+                    }
+                }
+        }
+
 
     }
 }

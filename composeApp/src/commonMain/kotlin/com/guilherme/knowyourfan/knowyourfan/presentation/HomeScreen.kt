@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.guilherme.knowyourfan.knowyourfan.presentation.ui.placeholderTextColor
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.x_twitter_brands
@@ -35,6 +37,10 @@ import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel) {
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val onEvent = viewModel::onEvent
+
     Column(
         modifier = Modifier
             .statusBarsPadding()
@@ -70,7 +76,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(IntrinsicSize.Max),
-                onClick = { },
+                onClick = { onEvent(HomeEvents.OnLinkWithXButtonClicked) },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors().copy(
                     contentColor = Color.Black,
