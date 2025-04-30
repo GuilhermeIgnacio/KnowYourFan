@@ -5,15 +5,19 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.GetCredentialInterruptedException
 import androidx.credentials.exceptions.GetCredentialUnknownException
 import com.google.firebase.FirebaseTooManyRequestsException
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.UserInfo
 import com.google.firebase.firestore.FirebaseFirestore
+import com.guilherme.knowyourfan.core.domain.UserCheckError
 import com.guilherme.knowyourfan.domain.AuthenticationError
 import com.guilherme.knowyourfan.domain.Result
 import kotlinx.coroutines.tasks.await
+import kotlin.contracts.Returns
 
 class FirebaseAuthenticationImpl(
     private val auth: FirebaseAuth,
@@ -83,6 +87,18 @@ class FirebaseAuthenticationImpl(
 
             Result.Error(error)
 
+        }
+
+    }
+
+    override suspend fun isAccountLinkedToX(): Result<Boolean, UserCheckError.User> {
+
+        val currentUser = auth.currentUser
+
+        return if (currentUser != null) {
+            Result.Success(currentUser.providerId == EmailAuthProvider.PROVIDER_ID)
+        } else {
+            Result.Error(UserCheckError.User.NULL_USER)
         }
 
     }
