@@ -97,7 +97,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(IntrinsicSize.Max),
-                onClick = { },
+                onClick = { onEvent(HomeEvents.OnLinkWithXButtonClicked) },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors().copy(
                     contentColor = Color.White,

@@ -1,26 +1,28 @@
 package com.guilherme.knowyourfan.knowyourfan.data.remote.firebase
 
+import android.content.ActivityNotFoundException
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.GetCredentialInterruptedException
 import androidx.credentials.exceptions.GetCredentialUnknownException
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthMultiFactorException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.FirebaseAuthWebException
 import com.google.firebase.auth.OAuthProvider
-import com.google.firebase.auth.TwitterAuthProvider
-import com.google.firebase.auth.UserInfo
 import com.google.firebase.firestore.FirebaseFirestore
 import com.guilherme.knowyourfan.MainActivity
+import com.guilherme.knowyourfan.core.domain.LinkingError
 import com.guilherme.knowyourfan.core.domain.UserCheckError
 import com.guilherme.knowyourfan.domain.AuthenticationError
 import com.guilherme.knowyourfan.domain.Result
 import kotlinx.coroutines.tasks.await
-import kotlin.contracts.Returns
 
 class FirebaseAuthenticationImpl(
     private val auth: FirebaseAuth,
@@ -107,22 +109,39 @@ class FirebaseAuthenticationImpl(
 
     }
 
-    override suspend fun linkAccountToX() {
-        val provider = OAuthProvider.newBuilder("twitter.com")
-        val currentUser = auth.currentUser
+    override suspend fun linkAccountToX(): Result<Unit, LinkingError.Twitter> {
+        val user = auth.currentUser
+            ?: return Result.Error(LinkingError.Twitter.NULL_USER)
 
-        if (currentUser != null) {
-            val foo = auth.startActivityForSignInWithProvider(activity, provider.build())
-                .addOnSuccessListener {
+        return runCatching {
+            val linkResult = user
+                .startActivityForLinkWithProvider(
+                    activity,
+                    OAuthProvider.newBuilder("twitter.com").build()
+                )
+                .await()
 
-                    val credential = it.credential
+            val credential = linkResult.credential
+                ?: throw IllegalStateException()
 
-                    if (credential != null) {
-                        currentUser.linkWithCredential(credential)
-                    }
+            user.linkWithCredential(credential).await()
+        }.fold(
+            onSuccess = {
+                Result.Success(Unit)
+            },
+            onFailure = { e ->
+                e.printStackTrace()
+                when (e) {
+                    is IllegalArgumentException -> Result.Error(LinkingError.Twitter.NULL_CREDENTIALS)
+                    is FirebaseAuthMultiFactorException -> Result.Error(LinkingError.Twitter.MFA_REQUIRED)
+                    is ActivityNotFoundException -> Result.Error(LinkingError.Twitter.NO_BROWSER_FOUND)
+                    is FirebaseAuthUserCollisionException -> Result.Error(LinkingError.Twitter.ACCOUNT_ALREADY_LINKED)
+                    is FirebaseAuthWebException -> Result.Error(LinkingError.Twitter.WEB_ERROR)
+                    is FirebaseNetworkException -> Result.Error(LinkingError.Twitter.NETWORK_ERROR)
+                    is FirebaseTooManyRequestsException -> Result.Error(LinkingError.Twitter.RATE_LIMITED)
+                    else -> Result.Error(LinkingError.Twitter.UNKNOWN)
                 }
-        }
-
-
+            }
+        )
     }
 }

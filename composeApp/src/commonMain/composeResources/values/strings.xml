@@ -23,4 +23,13 @@
     <string name="password_empty_field_error_message">The password field should not be empty</string>
     <string name="invalid_email_error_message">Invalid Email. Please provide a valid email.</string>
 
+    <string name="null_user_exception_message">No user is currently signed in.</string>
+    <string name="invalid_argument_exception_message">Invalid argument provided. Please try again.</string>
+    <string name="network_exception_message">Network error. Please check your internet connection and try again.</string>
+    <string name="web_error_exception_message">A web error occurred during authentication. Please check your network and try again.</string>
+    <string name="null_credentials_exception_message">Received null credentials from Twitter.</string>
+    <string name="mfa_exception_message">Multi-factor authentication is required. Please complete MFA to continue.</string>
+    <string name="no_browser_found_exception_message">No application available to complete the Twitter sign-in flow.</string>
+    <string name="already_linked_account_exception_message">This Twitter account is already linked to another user.</string>
+
 </resources>
