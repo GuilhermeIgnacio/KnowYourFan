@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.pluginSerialization)
     alias(libs.plugins.googleServices)
+    id("app.cash.sqldelight") version "2.0.2"
 }
 
 kotlin {
@@ -35,6 +36,10 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+
+            //SqlDelight
+            implementation("app.cash.sqldelight:android-driver:2.0.2")
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -91,6 +96,18 @@ kotlin {
             //Coil
             implementation("io.coil-kt.coil3:coil-compose:3.1.0")
             implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
+
+            //SqlDelight
+            implementation("app.cash.sqldelight:sqlite-driver:2.0.2")
+
+        }
+    }
+}
+
+sqldelight {
+    databases {
+        create("Database") {
+            packageName.set("com.guilherme")
         }
     }
 }

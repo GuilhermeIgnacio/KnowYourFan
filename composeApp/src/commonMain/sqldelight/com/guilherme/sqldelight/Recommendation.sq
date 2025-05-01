@@ -1,0 +1,11 @@
+CREATE TABLE recommendation (
+    id INTEGER PRIMARY KEY NOT NULL,
+    title TEXT,
+    link TEXT
+);
+
+selectAll: SELECT * FROM recommendation;
+
+insert: INSERT INTO recommendation (title, link) VALUES (?,?);
+
+delete: DELETE FROM recommendation WHERE id = :id;

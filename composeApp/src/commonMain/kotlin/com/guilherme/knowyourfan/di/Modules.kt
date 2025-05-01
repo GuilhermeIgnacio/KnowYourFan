@@ -1,7 +1,9 @@
 package com.guilherme.knowyourfan.di
 
+import com.guilherme.knowyourfan.knowyourfan.data.local.RecommendationImpl
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.GeminiService
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.GeminiImpl
+import com.guilherme.knowyourfan.knowyourfan.domain.RecommendationRepository
 import com.guilherme.knowyourfan.knowyourfan.presentation.AuthenticationViewModel
 import com.guilherme.knowyourfan.knowyourfan.presentation.HomeViewModel
 import com.guilherme.knowyourfan.knowyourfan.presentation.SignUpViewModel
@@ -13,7 +15,8 @@ expect fun platformModule(activity: Any): Module
 
 val sharedModules = module {
     single<GeminiService> { GeminiImpl() }
+    single<RecommendationRepository> { RecommendationImpl(get()) }
     viewModel { AuthenticationViewModel(get()) }
     viewModel { SignUpViewModel(get(), get()) }
-    viewModel { HomeViewModel(get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get()) }
 }

@@ -7,6 +7,8 @@ import com.guilherme.knowyourfan.core.domain.LinkingError
 import com.guilherme.knowyourfan.domain.Result
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.GeminiService
 import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseAuthentication
+import com.guilherme.knowyourfan.knowyourfan.domain.Recommendation
+import com.guilherme.knowyourfan.knowyourfan.domain.RecommendationRepository
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.already_linked_account_exception_message
 import knowyourfan.composeapp.generated.resources.firebase_auth_too_many_requestes_exception_message
@@ -26,6 +28,7 @@ import org.jetbrains.compose.resources.StringResource
 data class HomeState(
     val isLinkedWithX: Boolean = true,
     val errorMessage: StringResource? = null,
+    val recommendations: List<Recommendation> = emptyList()
 )
 
 sealed interface HomeEvents {
@@ -35,6 +38,7 @@ sealed interface HomeEvents {
 class HomeViewModel(
     private val firebaseAuthentication: FirebaseAuthentication,
     private val gemini: GeminiService,
+    private val recommendation: RecommendationRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -52,6 +56,10 @@ class HomeViewModel(
             }
         }
     }*/
+
+    init {
+        _state.update { it.copy(recommendations = recommendation.fetchData())  }
+    }
 
     fun onEvent(event: HomeEvents) {
         when (event) {
@@ -96,7 +104,34 @@ class HomeViewModel(
             when (val result = gemini.getRecommendations()) {
                 is Result.Success -> {
 
+
+                    val triple = mutableListOf<Triple<String, String, String>>()
+
+
+
+                    result.data.candidates.forEach { candidate ->
+                        candidate.grounding?.chunks?.forEach { chunk ->
+                            candidate.grounding.supports.forEach { support ->
+                                triple += Triple(
+                                    chunk.web.uri,
+                                    chunk.web.title,
+                                    support.segment.text
+                                )
+                            }
+                        }
+                    }
+
+
+                    triple.forEach {
+                        recommendation.cacheData(
+                            it.second,
+                            it.third
+                        )
+                    }
+
+
                 }
+
                 is Result.Error -> {
                     val errorMessage = when (result.error) {
                         GeminiError.Recommendations.UNKNOWN -> "TODO()"
