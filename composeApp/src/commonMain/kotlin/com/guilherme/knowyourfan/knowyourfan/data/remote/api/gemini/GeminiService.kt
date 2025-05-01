@@ -7,4 +7,6 @@ interface GeminiService {
 
     suspend fun analyzeImage(image: String, id: String): Result<String?, GeminiError.Gemini>
 
+    suspend fun getRecommendations()
+
 }

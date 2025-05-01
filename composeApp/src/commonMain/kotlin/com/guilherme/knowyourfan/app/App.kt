@@ -21,7 +21,7 @@ fun App() {
 
     val navController = rememberNavController()
     Surface(modifier = Modifier.fillMaxSize()) {
-        NavHost(navController = navController, startDestination = Route.AuthGraph) {
+        NavHost(navController = navController, startDestination = Route.HomeGraph) {
             navigation<Route.AuthGraph>(
                 startDestination = Route.AuthenticationScreen
             ) {

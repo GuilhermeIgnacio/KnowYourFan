@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.guilherme.knowyourfan.core.domain.LinkingError
 import com.guilherme.knowyourfan.domain.Result
+import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.GeminiService
 import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseAuthentication
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.already_linked_account_exception_message
@@ -22,8 +23,8 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 
 data class HomeState(
-    val isLinkedWithX: Boolean = false,
-    val errorMessage: StringResource? = null
+    val isLinkedWithX: Boolean = true,
+    val errorMessage: StringResource? = null,
 )
 
 sealed interface HomeEvents {
@@ -32,6 +33,7 @@ sealed interface HomeEvents {
 
 class HomeViewModel(
     private val firebaseAuthentication: FirebaseAuthentication,
+    private val gemini: GeminiService,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -54,12 +56,13 @@ class HomeViewModel(
         when (event) {
             HomeEvents.OnLinkWithXButtonClicked -> {
                 viewModelScope.launch {
-                    when(val result = firebaseAuthentication.linkAccountToX()) {
+                    when (val result = firebaseAuthentication.linkAccountToX()) {
                         is Result.Success -> {
 
                         }
+
                         is Result.Error -> {
-                            val errorMessage = when(result.error) {
+                            val errorMessage = when (result.error) {
                                 LinkingError.Twitter.NULL_USER -> Res.string.null_user_exception_message
                                 LinkingError.Twitter.NULL_CREDENTIALS -> Res.string.null_credentials_exception_message
                                 LinkingError.Twitter.MFA_REQUIRED -> Res.string.mfa_exception_message
@@ -74,6 +77,7 @@ class HomeViewModel(
                             _state.update { it.copy(errorMessage = errorMessage) }
 
                         }
+
                         Result.Loading -> {}
                     }
 
@@ -84,6 +88,12 @@ class HomeViewModel(
 
     fun clearErrorMessage() {
         _state.update { it.copy(errorMessage = null) }
+    }
+
+    fun getRecommendations() {
+        viewModelScope.launch {
+            gemini.getRecommendations()
+        }
     }
 
 }

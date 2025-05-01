@@ -18,6 +18,7 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
@@ -25,10 +26,16 @@ import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.io.IOException
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.putJsonObject
 
 class GeminiImpl : GeminiService {
 
     companion object {
+        const val GEMINI_ENDPOINT =
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="
         const val GOOGLE_API_KEY = "AIzaSyBaO_K7pbsAeycoi6Z5JhCLkqY2fKPPLUM"
     }
 
@@ -65,7 +72,7 @@ class GeminiImpl : GeminiService {
 
         return try {
             val response: HttpResponse =
-                client.post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$GOOGLE_API_KEY") {
+                client.post(GEMINI_ENDPOINT + GOOGLE_API_KEY) {
 
                     header(HttpHeaders.ContentType, ContentType.Application.Json)
 
@@ -79,7 +86,7 @@ class GeminiImpl : GeminiService {
             Result.Success(foo)
 
         } catch (e: Exception) {
-            val error = when(e) {
+            val error = when (e) {
                 is SerializationException -> GeminiError.Gemini.SERIALIZATION
                 is RedirectResponseException -> GeminiError.Gemini.REDIRECT_RESPONSE
                 is ClientRequestException -> GeminiError.Gemini.CLIENT_REQUEST
@@ -92,6 +99,46 @@ class GeminiImpl : GeminiService {
             Result.Error(error)
         } finally {
             client.close()
+        }
+    }
+
+    override suspend fun getRecommendations() {
+
+        val prompt = "Busque conteúdos que sejam relevantes para este perfil de usuário tendo como contexto o mundo dos e-sports. Jogos de interesse: Counter-Strike, Valorant. Eventos que participou(presenciais e online): Major Rio 2022. Compras no último ano: Jersey Furia. Retorne notícias recentes com um header e link para cada notícia"
+
+        val requestBody = buildJsonObject {
+            put("contents", buildJsonArray {
+                add(buildJsonObject {
+                    put("parts", buildJsonArray {
+                        add(buildJsonObject {
+                            put("text", JsonPrimitive(prompt))
+                        })
+                    })
+                })
+            })
+
+            put("tools", buildJsonArray {
+                add(buildJsonObject {
+                    putJsonObject("google_search") {}
+                })
+            })
+        }
+
+        try {
+
+            val response = client.post(GEMINI_ENDPOINT + GOOGLE_API_KEY) {
+
+                header(HttpHeaders.ContentType, ContentType.Application.Json)
+
+                setBody(requestBody)
+
+            }
+
+
+            println(response.bodyAsText())
+
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

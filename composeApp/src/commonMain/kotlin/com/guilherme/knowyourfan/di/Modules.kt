@@ -15,5 +15,5 @@ val sharedModules = module {
     single<GeminiService> { GeminiImpl() }
     viewModel { AuthenticationViewModel(get()) }
     viewModel { SignUpViewModel(get(), get()) }
-    viewModel { HomeViewModel(get()) }
+    viewModel { HomeViewModel(get(), get()) }
 }
