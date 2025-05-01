@@ -2,6 +2,7 @@ package com.guilherme.knowyourfan.knowyourfan.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.guilherme.knowyourfan.core.domain.GeminiError
 import com.guilherme.knowyourfan.core.domain.LinkingError
 import com.guilherme.knowyourfan.domain.Result
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.GeminiService
@@ -92,7 +93,23 @@ class HomeViewModel(
 
     fun getRecommendations() {
         viewModelScope.launch {
-            gemini.getRecommendations()
+            when (val result = gemini.getRecommendations()) {
+                is Result.Success -> {
+
+                }
+                is Result.Error -> {
+                    val errorMessage = when (result.error) {
+                        GeminiError.Recommendations.UNKNOWN -> "TODO()"
+                        GeminiError.Recommendations.BAD_REQUEST -> "TODO()"
+                        GeminiError.Recommendations.UNAUTHORIZED -> "TODO()"
+                        GeminiError.Recommendations.SERVER_ERROR -> "TODO()"
+                        GeminiError.Recommendations.SERVICE_UNAVAILABLE -> "TODO()"
+                    }
+                }
+
+                Result.Loading -> {}
+            }
+
         }
     }
 

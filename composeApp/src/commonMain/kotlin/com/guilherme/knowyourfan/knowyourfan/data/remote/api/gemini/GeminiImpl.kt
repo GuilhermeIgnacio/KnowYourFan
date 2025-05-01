@@ -2,6 +2,7 @@ package com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini
 
 import com.guilherme.knowyourfan.core.domain.GeminiError
 import com.guilherme.knowyourfan.domain.Result
+import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.model.ApiResponse
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.model.Content
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.model.InlineData
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.model.Part
@@ -21,6 +22,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.io.IOException
@@ -102,9 +104,10 @@ class GeminiImpl : GeminiService {
         }
     }
 
-    override suspend fun getRecommendations() {
+    override suspend fun getRecommendations(): Result<ApiResponse, GeminiError.Recommendations> {
 
-        val prompt = "Busque conteúdos que sejam relevantes para este perfil de usuário tendo como contexto o mundo dos e-sports. Jogos de interesse: Counter-Strike, Valorant. Eventos que participou(presenciais e online): Major Rio 2022. Compras no último ano: Jersey Furia. Retorne notícias recentes com um header e link para cada notícia"
+        val prompt =
+            "Busque conteúdos que sejam relevantes para este perfil de usuário tendo como contexto o mundo dos e-sports. Jogos de interesse: Counter-Strike, Valorant. Eventos que participou(presenciais e online): Major Rio 2022. Compras no último ano: Jersey Furia. Retorne notícias recentes com um header e link para cada notícia"
 
         val requestBody = buildJsonObject {
             put("contents", buildJsonArray {
@@ -124,7 +127,7 @@ class GeminiImpl : GeminiService {
             })
         }
 
-        try {
+        return try {
 
             val response = client.post(GEMINI_ENDPOINT + GOOGLE_API_KEY) {
 
@@ -134,11 +137,22 @@ class GeminiImpl : GeminiService {
 
             }
 
-
             println(response.bodyAsText())
 
+            when (response.status) {
+                HttpStatusCode.OK -> Result.Success(response.body())
+                HttpStatusCode.BadRequest -> Result.Error(GeminiError.Recommendations.BAD_REQUEST)
+                HttpStatusCode.Unauthorized -> Result.Error(GeminiError.Recommendations.UNAUTHORIZED)
+                HttpStatusCode.InternalServerError -> Result.Error(GeminiError.Recommendations.SERVER_ERROR)
+                HttpStatusCode.ServiceUnavailable -> Result.Error(GeminiError.Recommendations.SERVICE_UNAVAILABLE)
+                else -> Result.Error(GeminiError.Recommendations.UNKNOWN)
+            }
+
         } catch (e: Exception) {
-            e.printStackTrace()
+            val error = when (e) {
+                else -> GeminiError.Recommendations.UNKNOWN
+            }
+            Result.Error(error)
         }
     }
 
