@@ -28,7 +28,7 @@ import org.jetbrains.compose.resources.StringResource
 data class HomeState(
     val isLinkedWithX: Boolean = true,
     val errorMessage: StringResource? = null,
-    val recommendations: List<Recommendation> = emptyList()
+    val recommendations: List<Recommendation> = emptyList(),
 )
 
 sealed interface HomeEvents {
@@ -38,7 +38,7 @@ sealed interface HomeEvents {
 class HomeViewModel(
     private val firebaseAuthentication: FirebaseAuthentication,
     private val gemini: GeminiService,
-    private val recommendation: RecommendationRepository
+    private val recommendation: RecommendationRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -58,7 +58,13 @@ class HomeViewModel(
     }*/
 
     init {
-        _state.update { it.copy(recommendations = recommendation.fetchData())  }
+        viewModelScope.launch {
+
+            recommendation.fetchData().collect { recommendations ->
+                _state.update { it.copy(recommendations = recommendations) }
+            }
+
+        }
     }
 
     fun onEvent(event: HomeEvents) {
@@ -104,31 +110,22 @@ class HomeViewModel(
             when (val result = gemini.getRecommendations()) {
                 is Result.Success -> {
 
-
-                    val triple = mutableListOf<Triple<String, String, String>>()
-
-
-
-                    result.data.candidates.forEach { candidate ->
-                        candidate.grounding?.chunks?.forEach { chunk ->
-                            candidate.grounding.supports.forEach { support ->
-                                triple += Triple(
-                                    chunk.web.uri,
-                                    chunk.web.title,
-                                    support.segment.text
-                                )
+                    val foo = result.data.candidates
+                        .asSequence()
+                        .mapNotNull { it.grounding }
+                        .flatMap { grounding ->
+                            grounding.chunks.flatMap { chunk ->
+                                grounding.supports.map { support ->
+                                    Recommendation(
+                                        title = chunk.web.title,
+                                        link = support.segment.text
+                                    )
+                                }
                             }
                         }
-                    }
+                        .toList()
 
-
-                    triple.forEach {
-                        recommendation.cacheData(
-                            it.second,
-                            it.third
-                        )
-                    }
-
+                    recommendation.cacheData(foo)
 
                 }
 

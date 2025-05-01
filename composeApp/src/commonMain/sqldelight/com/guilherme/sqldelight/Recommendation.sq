@@ -1,7 +1,7 @@
 CREATE TABLE recommendation (
     id INTEGER PRIMARY KEY NOT NULL,
-    title TEXT,
-    link TEXT
+    title TEXT NOT NULL,
+    link TEXT NOT NULL
 );
 
 selectAll: SELECT * FROM recommendation;
