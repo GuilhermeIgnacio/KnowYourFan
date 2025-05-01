@@ -101,6 +101,8 @@ kotlin {
             implementation("app.cash.sqldelight:sqlite-driver:2.0.2")
             implementation("app.cash.sqldelight:coroutines-extensions:2.0.2")
 
+            //DataStore
+            implementation("androidx.datastore:datastore-preferences:1.1.1")
 
         }
     }

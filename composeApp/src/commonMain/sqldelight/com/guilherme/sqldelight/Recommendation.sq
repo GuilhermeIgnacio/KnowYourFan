@@ -8,4 +8,4 @@ selectAll: SELECT * FROM recommendation;
 
 insert: INSERT INTO recommendation (title, link) VALUES (?,?);
 
-delete: DELETE FROM recommendation WHERE id = :id;
+deleteAll: DELETE FROM recommendation;

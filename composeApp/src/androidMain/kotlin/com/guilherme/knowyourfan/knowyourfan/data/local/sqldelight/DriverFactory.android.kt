@@ -1,4 +1,4 @@
-package com.guilherme.knowyourfan.knowyourfan.data.local
+package com.guilherme.knowyourfan.knowyourfan.data.local.sqldelight
 
 import android.content.Context
 import app.cash.sqldelight.db.SqlDriver

@@ -1,15 +1,13 @@
-package com.guilherme.knowyourfan.knowyourfan.data.local
+package com.guilherme.knowyourfan.knowyourfan.data.local.sqldelight
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import app.cash.sqldelight.db.SqlDriver
 import com.guilherme.Database
 import com.guilherme.knowyourfan.knowyourfan.domain.Recommendation
 import com.guilherme.knowyourfan.knowyourfan.domain.RecommendationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
 
 class RecommendationImpl(
     private val driverFactory: DriverFactory,
@@ -32,6 +30,8 @@ class RecommendationImpl(
     override suspend fun cacheData(recommendations: List<Recommendation>) {
 
         recommendationQueries.transaction {
+            recommendationQueries.deleteAll()
+
             recommendations.forEach { recommendation ->
                 recommendationQueries.insert(
                     recommendation.title,

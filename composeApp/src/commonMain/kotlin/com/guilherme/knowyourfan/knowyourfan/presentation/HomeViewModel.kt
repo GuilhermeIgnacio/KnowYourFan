@@ -7,6 +7,7 @@ import com.guilherme.knowyourfan.core.domain.LinkingError
 import com.guilherme.knowyourfan.domain.Result
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.GeminiService
 import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseAuthentication
+import com.guilherme.knowyourfan.knowyourfan.domain.DataStoreRepository
 import com.guilherme.knowyourfan.knowyourfan.domain.Recommendation
 import com.guilherme.knowyourfan.knowyourfan.domain.RecommendationRepository
 import knowyourfan.composeapp.generated.resources.Res
@@ -21,9 +22,12 @@ import knowyourfan.composeapp.generated.resources.unknown_error_occurred_message
 import knowyourfan.composeapp.generated.resources.web_error_exception_message
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
+import kotlin.time.ExperimentalTime
 
 data class HomeState(
     val isLinkedWithX: Boolean = true,
@@ -35,10 +39,12 @@ sealed interface HomeEvents {
     data object OnLinkWithXButtonClicked : HomeEvents
 }
 
+@OptIn(ExperimentalTime::class)
 class HomeViewModel(
     private val firebaseAuthentication: FirebaseAuthentication,
     private val gemini: GeminiService,
     private val recommendation: RecommendationRepository,
+    private val dataStore: DataStoreRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -46,26 +52,38 @@ class HomeViewModel(
 
     /*init {
         viewModelScope.launch {
-            when (val result = firebaseAuthentication.isAccountLinkedToX()) {
-                is Result.Success -> {
-                    _state.update { it.copy(isLinkedWithX = result.data) }
-                }
 
-                is Result.Error -> {}
-                Result.Loading -> {}
+            if (dataStore.shouldCallApi()) {
+                getRecommendations()
+                println("Api Called")
+            }
+
+
+        }.invokeOnCompletion {
+            viewModelScope.launch {
+                recommendation.fetchData().collect { recommendations ->
+                    _state.update { it.copy(recommendations = recommendations) }
+                }
             }
         }
     }*/
 
     init {
         viewModelScope.launch {
-
-            recommendation.fetchData().collect { recommendations ->
-                _state.update { it.copy(recommendations = recommendations) }
-            }
-
+            recommendation.fetchData()
+                .onStart {
+                    if (dataStore.shouldCallApi()) {
+                        getRecommendations()
+                        println("API Called")
+                    }
+                }
+                .catch { e -> /* log/error state */ }
+                .collect { recs ->
+                    _state.update { it.copy(recommendations = recs) }
+                }
         }
     }
+
 
     fun onEvent(event: HomeEvents) {
         when (event) {
@@ -127,6 +145,7 @@ class HomeViewModel(
 
                     recommendation.cacheData(foo)
 
+                    dataStore.updateLastApiCallTime()
                 }
 
                 is Result.Error -> {
