@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -54,7 +56,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
             )
         } else {
 
-            Button(onClick = { viewModel.getRecommendations() }) {
+            /*Button(onClick = { viewModel.getRecommendations() }) {
                 Text("Generate Recommendations")
             }
 
@@ -66,7 +68,36 @@ fun HomeScreen(viewModel: HomeViewModel) {
                     HorizontalDivider()
 
                 }
+            }*/
+
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(state.recommendations) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors()
+                            .copy(containerColor = Color(0xFF1f2937), contentColor = Color.White)
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(12.dp),
+                            text = it.title,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        HorizontalDivider()
+                        Text(
+                            modifier = Modifier.padding(12.dp),
+                            text = it.link,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+                }
             }
+
 
         }
 

@@ -134,10 +134,13 @@ class HomeViewModel(
                         .flatMap { grounding ->
                             grounding.chunks.flatMap { chunk ->
                                 grounding.supports.map { support ->
-                                    Recommendation(
-                                        title = chunk.web.title,
-                                        link = support.segment.text
-                                    )
+
+                                    parseRecommendation(support.segment.text)
+
+                                    /*Recommendation(
+                                        title = support.segment.text,
+                                        link = "support.segment.text"
+                                    )*/
                                 }
                             }
                         }
@@ -162,6 +165,28 @@ class HomeViewModel(
             }
 
         }
+    }
+
+    fun parseRecommendation(rawText: String): Recommendation {
+        // Regex sem opções especiais, apenas três grupos de captura:
+        // 1: título, 2: link, 3: data
+        val regex = Regex(
+            """\*\*Título:\*\*\s*(.+?)\r?\n\*\*Link:\*\*\s*(.+?)\r?\n\*\*Data:\*\*\s*(.+)"""
+        )
+
+        val match = regex.find(rawText.trim())
+            ?: throw IllegalArgumentException("Formato inválido: $rawText")
+
+        // groupValues[0] = string toda; [1] = título; [2] = link; [3] = data
+        val titleText = match.groupValues[1]
+        val linkText  = match.groupValues[2]
+        val dateText  = match.groupValues[3]
+
+        // Parser de data: "29 de abril de 2025"
+        /*val formatter = DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy")
+        val date = LocalDate.parse(dateText, formatter)*/
+
+        return Recommendation(titleText, linkText, /*date*/)
     }
 
 }

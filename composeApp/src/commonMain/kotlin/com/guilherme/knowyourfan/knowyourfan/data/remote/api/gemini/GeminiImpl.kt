@@ -107,7 +107,7 @@ class GeminiImpl : GeminiService {
     override suspend fun getRecommendations(): Result<ApiResponse, GeminiError.Recommendations> {
 
         val prompt =
-            "Busque conteúdos que sejam relevantes para este perfil de usuário tendo como contexto o mundo dos e-sports. Jogos de interesse: Counter-Strike, Valorant. Eventos que participou(presenciais e online): Major Rio 2022. Compras no último ano: Jersey Furia. Retorne notícias recentes com um header e link para cada notícia"
+            "**Tarefa:** Encontrar as notícias mais recentes **que sejam relevantes para este perfil de usuário tendo como contexto o mundo dos e-sports. Jogos de interesse: Counter-Strike, Valorant. Eventos que participou(presenciais e online): Major Rio 2022. Compras no último ano: Jersey Furia**.\\n\\n**Instruções:**\\n1. Utilize a busca do Google (Grounding with Google Search) para encontrar as notícias mais recentes e relevantes sobre o assunto fornecido.\\n2. Para **CADA** notícia encontrada, extraia e apresente as informações **EXATAMENTE** na seguinte estrutura:\\n\\n    **Título:** [Título completo da notícia]\\n    **Link:** [URL completo para a notícia]\\n    **Data:** [Data de publicação da notícia (formato: DD/MM/AAAA, se disponível, ou a descrição mais próxima como \\\"há X horas\\\", \\\"ontem\\\")]\\n\\n3. Liste cada notícia como um bloco separado, seguindo rigorosamente a estrutura acima.\\n4. Priorize as notícias publicadas nas últimas 24-48 horas, se possível.\\n5. Não adicione nenhum texto introdutório, resumo, análise ou conclusão. Apresente *apenas* a lista de notícias formatadas conforme solicitado."
 
         val requestBody = buildJsonObject {
             put("contents", buildJsonArray {
@@ -136,8 +136,7 @@ class GeminiImpl : GeminiService {
                 setBody(requestBody)
 
             }
-
-            println(response.bodyAsText())
+            println("ApiResponse -> ${response.body<ApiResponse>()}")
 
             when (response.status) {
                 HttpStatusCode.OK -> Result.Success(response.body())

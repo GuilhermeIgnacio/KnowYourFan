@@ -32,7 +32,7 @@ class RecommendationImpl(
         recommendationQueries.transaction {
             recommendationQueries.deleteAll()
 
-            recommendations.forEach { recommendation ->
+            recommendations.distinct().forEach { recommendation ->
                 recommendationQueries.insert(
                     recommendation.title,
                     recommendation.link

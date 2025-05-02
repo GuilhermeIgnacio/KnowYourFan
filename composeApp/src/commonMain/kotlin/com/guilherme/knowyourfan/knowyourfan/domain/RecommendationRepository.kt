@@ -11,5 +11,5 @@ interface RecommendationRepository {
 
 data class Recommendation(
     val title: String,
-    val link: String
+    val link: String,
 )
