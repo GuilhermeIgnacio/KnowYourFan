@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.guilherme.knowyourfan.core.domain.GeminiError
 import com.guilherme.knowyourfan.core.domain.LinkingError
+import com.guilherme.knowyourfan.core.domain.UserCheckError
 import com.guilherme.knowyourfan.domain.Result
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.GeminiService
 import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseAuthentication
@@ -31,14 +32,17 @@ import org.jetbrains.compose.resources.StringResource
 import kotlin.time.ExperimentalTime
 
 data class HomeState(
-    val isLinkedWithX: Boolean = true,
+    val isLinkedWithX: Boolean = false,
     val errorMessage: StringResource? = null,
     val recommendations: List<Recommendation> = emptyList(),
+    val isLoading: Boolean = false
 )
 
 sealed interface HomeEvents {
     data object OnLinkWithXButtonClicked : HomeEvents
-    data class OnCardClicked(val value: String): HomeEvents
+    data object OnContinueWithoutXButtonClicked: HomeEvents
+    data object OnHomeScreenLoaded : HomeEvents
+    data class OnCardClicked(val value: String) : HomeEvents
 }
 
 @OptIn(ExperimentalTime::class)
@@ -53,48 +57,36 @@ class HomeViewModel(
     private val _state = MutableStateFlow(HomeState())
     val state = _state.asStateFlow()
 
-    /*init {
-        viewModelScope.launch {
-
-            if (dataStore.shouldCallApi()) {
-                getRecommendations()
-                println("Api Called")
-            }
-
-
-        }.invokeOnCompletion {
-            viewModelScope.launch {
-                recommendation.fetchData().collect { recommendations ->
-                    _state.update { it.copy(recommendations = recommendations) }
-                }
-            }
-        }
-    }*/
-
     init {
         viewModelScope.launch {
-            recommendation.fetchData()
-                .onStart {
-                    if (dataStore.shouldCallApi()) {
-                        getRecommendations()
-                        println("API Called")
+            when (val result = firebaseAuthentication.isAccountLinkedToX()) {
+                is Result.Success -> {
+                    _state.update { it.copy(isLinkedWithX = result.data) }
+                }
+
+                is Result.Error -> {
+                    val errorMessage = when (result.error) {
+                        UserCheckError.User.NULL_USER -> Res.string.null_user_exception_message
                     }
+
+                    _state.update { it.copy(errorMessage = errorMessage) }
+
                 }
-                .catch { e -> /* log/error state */ }
-                .collect { recs ->
-                    _state.update { it.copy(recommendations = recs) }
-                }
+
+                Result.Loading -> {}
+            }
+
         }
     }
-
 
     fun onEvent(event: HomeEvents) {
         when (event) {
             HomeEvents.OnLinkWithXButtonClicked -> {
                 viewModelScope.launch {
+                    _state.update { it.copy(isLoading = true) }
                     when (val result = firebaseAuthentication.linkAccountToX()) {
                         is Result.Success -> {
-
+                            _state.update { it.copy(isLinkedWithX = true) }
                         }
 
                         is Result.Error -> {
@@ -116,12 +108,32 @@ class HomeViewModel(
 
                         Result.Loading -> {}
                     }
-
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
 
             is HomeEvents.OnCardClicked -> {
                 browserOpener.openUrl(event.value)
+            }
+
+            HomeEvents.OnHomeScreenLoaded -> {
+                viewModelScope.launch {
+                    recommendation.fetchData()
+                        .onStart {
+                            if (dataStore.shouldCallApi()) {
+                                getRecommendations()
+                                println("API Called")
+                            }
+                        }
+                        .catch { e -> /* log/error state */ }
+                        .collect { recs ->
+                            _state.update { it.copy(recommendations = recs) }
+                        }
+                }
+            }
+
+            HomeEvents.OnContinueWithoutXButtonClicked -> {
+                _state.update { it.copy(isLinkedWithX = true) }
             }
         }
     }
@@ -130,7 +142,7 @@ class HomeViewModel(
         _state.update { it.copy(errorMessage = null) }
     }
 
-    fun getRecommendations() {
+    private fun getRecommendations() {
         viewModelScope.launch {
             when (val result = gemini.getRecommendations()) {
                 is Result.Success -> {
@@ -174,7 +186,7 @@ class HomeViewModel(
         }
     }
 
-    fun parseRecommendation(rawText: String): Recommendation {
+    private fun parseRecommendation(rawText: String): Recommendation {
         // Regex sem opções especiais, apenas três grupos de captura:
         // 1: título, 2: link, 3: data
         val regex = Regex(
@@ -186,14 +198,14 @@ class HomeViewModel(
 
         // groupValues[0] = string toda; [1] = título; [2] = link; [3] = data
         val titleText = match.groupValues[1]
-        val linkText  = match.groupValues[2]
-        val dateText  = match.groupValues[3]
+        val linkText = match.groupValues[2]
+        val dateText = match.groupValues[3]
 
         // Parser de data: "29 de abril de 2025"
         /*val formatter = DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy")
         val date = LocalDate.parse(dateText, formatter)*/
 
-        return Recommendation(titleText, linkText, /*date*/)
+        return Recommendation(titleText, linkText /*date*/)
     }
 
 }

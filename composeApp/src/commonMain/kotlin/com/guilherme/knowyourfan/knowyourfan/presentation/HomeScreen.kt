@@ -26,15 +26,22 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.guilherme.knowyourfan.knowyourfan.presentation.composables.LoadingIcon
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.continue_with_x
 import knowyourfan.composeapp.generated.resources.continue_without_x
@@ -42,6 +49,7 @@ import knowyourfan.composeapp.generated.resources.furia_logo
 import knowyourfan.composeapp.generated.resources.link_x_account
 import knowyourfan.composeapp.generated.resources.link_x_account_benefits
 import knowyourfan.composeapp.generated.resources.x_twitter_brands
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
@@ -52,63 +60,81 @@ fun HomeScreen(viewModel: HomeViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val onEvent = viewModel::onEvent
 
-
+    val snackBarHostState = remember { SnackbarHostState() }
 
     Spacer(Modifier.height(16.dp))
 
-    if (!state.isLinkedWithX) {
-        LinkAccount(
-            onEvent = onEvent
-        )
-    } else {
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth().statusBarsPadding().navigationBarsPadding(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+    LaunchedEffect(state.errorMessage) {
+        state.errorMessage?.let {
+            val foo = snackBarHostState.showSnackbar(message = getString(it))
+            when (foo){
+                SnackbarResult.Dismissed -> { viewModel.clearErrorMessage() }
+                SnackbarResult.ActionPerformed -> {}
+            }
+        }
+    }
 
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
+    ) {
+        if (!state.isLinkedWithX) {
+            LinkAccount(
+                onEvent = onEvent
+            )
+        } else {
+            LaunchedEffect(Unit) { onEvent(HomeEvents.OnHomeScreenLoaded) }
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth().statusBarsPadding().navigationBarsPadding(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
 
-                    IconButton(onClick = {}) {
-                        Image(
-                            modifier = Modifier.size(26.dp),
-                            bitmap = imageResource(Res.drawable.furia_logo),
-                            contentDescription = ""
-                        )
-                    }
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
 
-                    IconButton(onClick = {}) {
-                        Icon(
-                            imageVector = Icons.Filled.Person,
-                            contentDescription = ""
-                        )
+                        IconButton(onClick = {}) {
+                            Image(
+                                modifier = Modifier.size(26.dp),
+                                bitmap = imageResource(Res.drawable.furia_logo),
+                                contentDescription = ""
+                            )
+                        }
+
+                        IconButton(onClick = {}) {
+                            Icon(
+                                imageVector = Icons.Filled.Person,
+                                contentDescription = ""
+                            )
+                        }
                     }
                 }
-            }
 
-            items(state.recommendations) {
-                Card(
-                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
-                    onClick = { onEvent(HomeEvents.OnCardClicked(it.link)) },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors()
-                        .copy(containerColor = Color(0xFF1f2937), contentColor = Color.White)
-                ) {
-                    Text(
-                        modifier = Modifier.padding(16.dp),
-                        text = it.title,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleLarge
-                    )
+                items(state.recommendations) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
+                        onClick = { onEvent(HomeEvents.OnCardClicked(it.link)) },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors()
+                            .copy(containerColor = Color(0xFF1f2937), contentColor = Color.White)
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(16.dp),
+                            text = it.title,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
                 }
             }
         }
-
-
     }
+
+    if (state.isLoading) {
+        LoadingIcon()
+    }
+
 }
 
 @Composable
@@ -168,7 +194,7 @@ private fun LinkAccount(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(IntrinsicSize.Max),
-                onClick = { onEvent(HomeEvents.OnLinkWithXButtonClicked) },
+                onClick = { onEvent(HomeEvents.OnContinueWithoutXButtonClicked) },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors().copy(
                     contentColor = Color.White,

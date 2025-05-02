@@ -191,7 +191,9 @@ fun SignUpScreen(
                         && state.idTextField!!.matches(cpfRegex)
                         && state.selectedImageByteArray != null
                         && !state.passwordTextField.isNullOrEmpty()
-                        && state.passwordTextField == state.confirmPasswordTextField,
+                        && state.passwordTextField == state.confirmPasswordTextField
+                        && state.interestGamesList.isNotEmpty()
+                ,
 
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors().copy(

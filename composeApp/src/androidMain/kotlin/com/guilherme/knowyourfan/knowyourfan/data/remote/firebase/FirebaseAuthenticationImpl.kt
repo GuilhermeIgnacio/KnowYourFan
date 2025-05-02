@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseAuthWebException
 import com.google.firebase.auth.OAuthProvider
+import com.google.firebase.auth.TwitterAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.guilherme.knowyourfan.MainActivity
 import com.guilherme.knowyourfan.core.domain.LinkingError
@@ -102,7 +103,8 @@ class FirebaseAuthenticationImpl(
         val currentUser = auth.currentUser
 
         return if (currentUser != null) {
-            Result.Success(currentUser.providerId == EmailAuthProvider.PROVIDER_ID)
+            val foo = currentUser.providerData.any { it.providerId == TwitterAuthProvider.PROVIDER_ID }
+            Result.Success(foo)
         } else {
             Result.Error(UserCheckError.User.NULL_USER)
         }
