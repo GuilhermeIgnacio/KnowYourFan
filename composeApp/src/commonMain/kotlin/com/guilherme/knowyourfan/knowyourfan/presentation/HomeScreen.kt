@@ -36,9 +36,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import knowyourfan.composeapp.generated.resources.Res
+import knowyourfan.composeapp.generated.resources.continue_with_x
+import knowyourfan.composeapp.generated.resources.continue_without_x
 import knowyourfan.composeapp.generated.resources.furia_logo
+import knowyourfan.composeapp.generated.resources.link_x_account
+import knowyourfan.composeapp.generated.resources.link_x_account_benefits
 import knowyourfan.composeapp.generated.resources.x_twitter_brands
 import org.jetbrains.compose.resources.imageResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
 @Composable
@@ -118,7 +123,7 @@ private fun LinkAccount(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Link your X account",
+            text = stringResource(Res.string.link_x_account),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -128,7 +133,7 @@ private fun LinkAccount(
 
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Get better personalized information and recommendations",
+            text = stringResource(Res.string.link_x_account_benefits),
             textAlign = TextAlign.Center
         )
 
@@ -157,7 +162,7 @@ private fun LinkAccount(
 
                 Spacer(Modifier.width(8.dp))
 
-                Text(text = "Continue With X")
+                Text(text = stringResource(Res.string.continue_with_x))
             }
             Button(
                 modifier = Modifier
@@ -170,7 +175,7 @@ private fun LinkAccount(
                     containerColor = Color(0xFF1f2937),
                 )
             ) {
-                Text(text = "Continue Without X")
+                Text(text = stringResource(Res.string.continue_without_x))
             }
         }
     }

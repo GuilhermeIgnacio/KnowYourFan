@@ -53,8 +53,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -65,15 +63,27 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.guilherme.knowyourfan.core.presentation.CpfVisualTransformation
-import com.guilherme.knowyourfan.core.presentation.dashedBorder
 import com.guilherme.knowyourfan.knowyourfan.presentation.composables.LoadingIcon
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.address_card_regular
 import knowyourfan.composeapp.generated.resources.calendar_regular
+import knowyourfan.composeapp.generated.resources.confirm_email_placeholder
+import knowyourfan.composeapp.generated.resources.confirm_password_placeholder
+import knowyourfan.composeapp.generated.resources.cpf_placeholder
+import knowyourfan.composeapp.generated.resources.data_consent
+import knowyourfan.composeapp.generated.resources.email_textfield
 import knowyourfan.composeapp.generated.resources.furia_logo
 import knowyourfan.composeapp.generated.resources.image_solid
+import knowyourfan.composeapp.generated.resources.interest_games_label
+import knowyourfan.composeapp.generated.resources.list_events
+import knowyourfan.composeapp.generated.resources.list_purchases
+import knowyourfan.composeapp.generated.resources.password_textfield
+import knowyourfan.composeapp.generated.resources.register_button
+import knowyourfan.composeapp.generated.resources.submit_button
+import knowyourfan.composeapp.generated.resources.upload_id_photo
+import knowyourfan.composeapp.generated.resources.username_placeholder
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.stringResource
@@ -189,7 +199,7 @@ fun SignUpScreen(
                     containerColor = Color.White,
                 )
             ) {
-                Text(text = "Register")
+                Text(text = stringResource(Res.string.register_button))
             }
 
 
@@ -248,7 +258,7 @@ private fun InterestGamesSection(
     )
 
     Text(
-        text = "Select games you`re interested in",
+        text = stringResource(Res.string.interest_games_label),
         color = placeholderTextColor
     )
     FlowRow(
@@ -303,7 +313,7 @@ private fun IdSection(
     )
 
     Text(
-        text = "Upload your ID photo",
+        text = stringResource(Res.string.upload_id_photo),
         color = placeholderTextColor
     )
 
@@ -331,7 +341,7 @@ private fun IdSection(
             }
 
             Text(
-                text = "Don't worry, your data won't be stored. It only will be used for verification",
+                text = stringResource(Res.string.data_consent),
                 textAlign = TextAlign.Center,
                 color = placeholderTextColor
             )
@@ -340,7 +350,7 @@ private fun IdSection(
                 onClick = { singleImagePicker.launch() },
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(text = "Submit")
+                Text(text = stringResource(Res.string.submit_button))
             }
         }
 
@@ -385,7 +395,7 @@ private fun TextFields(
         modifier = Modifier.fillMaxWidth(),
         value = state.usernameTextField ?: "",
         onValueChange = { onEvent(SignUpEvents.OnUsernameTextFieldValueChanged(it)) },
-        placeholder = { Text(text = "Username") },
+        placeholder = { Text(text = stringResource(Res.string.username_placeholder)) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Outlined.Person,
@@ -402,7 +412,7 @@ private fun TextFields(
         modifier = Modifier.fillMaxWidth(),
         value = state.emailTextField ?: "",
         onValueChange = { onEvent(SignUpEvents.OnEmailTextFieldValueChanged(it)) },
-        placeholder = { Text(text = "Email") },
+        placeholder = { Text(text = stringResource(Res.string.email_textfield)) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Outlined.Email,
@@ -419,7 +429,7 @@ private fun TextFields(
         modifier = Modifier.fillMaxWidth(),
         value = state.confirmEmailTextField ?: "",
         onValueChange = { onEvent(SignUpEvents.OnConfirmEmailTextFieldValueChanged(it)) },
-        placeholder = { Text(text = "Confirm Email") },
+        placeholder = { Text(text = stringResource(Res.string.confirm_email_placeholder)) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Outlined.Email,
@@ -436,7 +446,7 @@ private fun TextFields(
         modifier = Modifier.fillMaxWidth(),
         value = state.idTextField ?: "",
         onValueChange = { onEvent(SignUpEvents.OnIdTextFieldValueChanged(it)) },
-        placeholder = { Text(text = "CPF") },
+        placeholder = { Text(text = stringResource(Res.string.cpf_placeholder)) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         visualTransformation = CpfVisualTransformation(),
         leadingIcon = {
@@ -457,7 +467,7 @@ private fun TextFields(
             .fillMaxWidth(),
         value = state.passwordTextField ?: "",
         onValueChange = { onEvent(SignUpEvents.OnPasswordTextFieldValueChanged(it)) },
-        placeholder = { Text(text = "Password") },
+        placeholder = { Text(text = stringResource(Res.string.password_textfield)) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Outlined.Lock,
@@ -478,7 +488,7 @@ private fun TextFields(
             .fillMaxWidth(),
         value = state.confirmPasswordTextField ?: "",
         onValueChange = { onEvent(SignUpEvents.OnConfirmPasswordTextFieldValueChanged(it)) },
-        placeholder = { Text(text = "Confirm Password") },
+        placeholder = { Text(text = stringResource(Res.string.confirm_password_placeholder)) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Outlined.Lock,
@@ -501,7 +511,7 @@ private fun TextFields(
             .fillMaxWidth(),
         value = state.lastYearPurchasesTextField ?: "",
         onValueChange = { onEvent(SignUpEvents.OnLastYearPurchasesTextFieldValueChanged(it)) },
-        placeholder = { Text(text = "List your purchases from the past year (separate with commas)") },
+        placeholder = { Text(text = stringResource(Res.string.list_purchases)) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Outlined.ShoppingCart,
@@ -549,7 +559,7 @@ private fun TextFields(
             .fillMaxWidth(),
         value = state.eventsTextField ?: "",
         onValueChange = { onEvent(SignUpEvents.OnEventsTextFieldValueChanged(it)) },
-        placeholder = { Text(text = "List events you participated(separate with commas)") },
+        placeholder = { Text(text = stringResource(Res.string.list_events)) },
         leadingIcon = {
             Icon(
                 modifier = Modifier.size(24.dp),

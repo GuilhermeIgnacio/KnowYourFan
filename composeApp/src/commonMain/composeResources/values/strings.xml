@@ -1,4 +1,37 @@
 <resources>
+
+    <!--  Authentication  -->
+    <string name="welcome_back">Welcome Back</string>
+    <string name="sign_in_to_continue">Sign In to Continue</string>
+    <string name="dont_an_account_label">Don't have an account?</string>
+    <string name="email_textfield">Email</string>
+    <string name="password_textfield">Password</string>
+    <string name="sign_in_button">Sign In</string>
+    <string name="sign_up"> Sign Up</string> <!-- This initial space should not be removed -->
+    <!--  Authentication  -->
+
+    <!--  SignUp  -->
+    <string name="username_placeholder">Username</string>
+    <string name="confirm_email_placeholder">Confirm Email</string>
+    <string name="cpf_placeholder">CPF</string>
+    <string name="confirm_password_placeholder">Confirm Password</string>
+    <string name="list_purchases">List your purchases from the past year (separate with commas)</string>
+    <string name="list_events">List events you participated(separate with commas)</string>
+    <string name="submit_button">Submit</string>
+    <string name="data_consent">Don't worry, your data won't be stored. It only will be used for verification</string>
+    <string name="upload_id_photo">Upload your ID photo</string>
+    <string name="interest_games_label">Select games you`re interested in</string>
+    <string name="register_button">Register</string>
+    <!--  SignUp  -->
+
+    <!--  Home  -->
+    <string name="link_x_account">Link your X account</string>
+    <string name="link_x_account_benefits">Get better personalized information and recommendations</string>
+    <string name="continue_with_x">Continue With X</string>
+    <string name="continue_without_x">Continue Without X</string>
+    <!--  Home  -->
+
+
     <string name="unknown_error_occurred_message">An unexpected problem occurred</string>
 
     <string name="get_credential_cancellation_exception_message">Operation cancelled by user.</string>
