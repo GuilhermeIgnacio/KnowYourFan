@@ -13,6 +13,8 @@ import com.guilherme.knowyourfan.knowyourfan.data.local.datastore.createDataStor
 import com.guilherme.knowyourfan.knowyourfan.data.local.sqldelight.DriverFactory
 import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseAuthentication
 import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseAuthenticationImpl
+import com.guilherme.knowyourfan.knowyourfan.domain.BrowserOpener
+import com.guilherme.knowyourfan.knowyourfan.presentation.BrowserOpenerImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -26,6 +28,8 @@ actual fun platformModule(activity: Any): Module = module {
     single<DriverFactory> { DriverFactory(activity as Context) }
 
     single<DataStore<Preferences>> { createDataStore(activity as Context) }
+
+    single<BrowserOpener> { BrowserOpenerImpl(activity as Context) }
 
     single<FirebaseAuthentication> {
         FirebaseAuthenticationImpl(auth = get(), db = get(), activity = activity as MainActivity)

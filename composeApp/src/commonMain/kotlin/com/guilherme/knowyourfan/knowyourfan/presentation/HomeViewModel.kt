@@ -7,6 +7,7 @@ import com.guilherme.knowyourfan.core.domain.LinkingError
 import com.guilherme.knowyourfan.domain.Result
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.GeminiService
 import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseAuthentication
+import com.guilherme.knowyourfan.knowyourfan.domain.BrowserOpener
 import com.guilherme.knowyourfan.knowyourfan.domain.DataStoreRepository
 import com.guilherme.knowyourfan.knowyourfan.domain.Recommendation
 import com.guilherme.knowyourfan.knowyourfan.domain.RecommendationRepository
@@ -37,6 +38,7 @@ data class HomeState(
 
 sealed interface HomeEvents {
     data object OnLinkWithXButtonClicked : HomeEvents
+    data class OnCardClicked(val value: String): HomeEvents
 }
 
 @OptIn(ExperimentalTime::class)
@@ -45,6 +47,7 @@ class HomeViewModel(
     private val gemini: GeminiService,
     private val recommendation: RecommendationRepository,
     private val dataStore: DataStoreRepository,
+    private val browserOpener: BrowserOpener
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -115,6 +118,10 @@ class HomeViewModel(
                     }
 
                 }
+            }
+
+            is HomeEvents.OnCardClicked -> {
+                browserOpener.openUrl(event.value)
             }
         }
     }
