@@ -64,4 +64,8 @@
     <string name="no_browser_found_exception_message">Nenhum aplicativo disponível para completar o fluxo de login com Twitter.</string>
     <string name="already_linked_account_exception_message">Esta conta do Twitter já está vinculada a outro usuário.</string>
 
+    <string name="firestore_null_user">Erro ao buscar interesses do usuário: usuário nulo</string>
+    <string name="firestore_permission_denied">Erro ao buscar interesses do usuário: permissão negada</string>
+    <string name="firestore_not_found">Erro ao buscar interesses do usuário: dados não encontrados</string>
+
 </resources>
