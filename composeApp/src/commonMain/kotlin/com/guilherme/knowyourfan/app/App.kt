@@ -12,6 +12,8 @@ import androidx.navigation.navigation
 import com.guilherme.knowyourfan.knowyourfan.presentation.AuthenticationScreen
 import com.guilherme.knowyourfan.knowyourfan.presentation.HomeScreen
 import com.guilherme.knowyourfan.knowyourfan.presentation.HomeViewModel
+import com.guilherme.knowyourfan.knowyourfan.presentation.ProfileScreen
+import com.guilherme.knowyourfan.knowyourfan.presentation.ProfileViewModel
 import com.guilherme.knowyourfan.knowyourfan.presentation.SignUpScreen
 import com.guilherme.knowyourfan.knowyourfan.presentation.SignUpViewModel
 import org.koin.compose.viewmodel.koinViewModel
@@ -21,7 +23,7 @@ fun App() {
 
     val navController = rememberNavController()
     Surface(modifier = Modifier.fillMaxSize()) {
-        NavHost(navController = navController, startDestination = Route.AuthGraph) {
+        NavHost(navController = navController, startDestination = Route.HomeGraph) {
             navigation<Route.AuthGraph>(
                 startDestination = Route.AuthenticationScreen
             ) {
@@ -47,8 +49,20 @@ fun App() {
             ) {
                 composable<Route.HomeScreen> {
                     val viewModel = koinViewModel<HomeViewModel>()
-                    HomeScreen(viewModel = viewModel)
+                    HomeScreen(
+                        viewModel = viewModel,
+                        onProfileButtonClicked = { navController.navigate(Route.ProfileScreen) }
+                    )
                 }
+
+                composable<Route.ProfileScreen> {
+                    val viewModel = koinViewModel<ProfileViewModel>()
+                    ProfileScreen(
+                        viewModel = viewModel,
+                        onReturnButtonClicked = {navController.navigate(Route.HomeScreen)}
+                    )
+                }
+
             }
 
         }

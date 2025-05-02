@@ -55,7 +55,10 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel) {
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    onProfileButtonClicked: () -> Unit
+) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val onEvent = viewModel::onEvent
@@ -102,7 +105,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                             )
                         }
 
-                        IconButton(onClick = {}) {
+                        IconButton(onClick = { onProfileButtonClicked() }) {
                             Icon(
                                 imageVector = Icons.Filled.Person,
                                 contentDescription = ""

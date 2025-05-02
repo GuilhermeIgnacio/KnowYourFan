@@ -86,6 +86,7 @@ kotlin {
 
             //Extended Icons
             implementation("androidx.compose.material:material-icons-extended:1.7.8")
+            implementation("androidx.compose.material:material-icons-extended-android:1.7.8")
 
             //Google Fonts
             implementation("androidx.compose.ui:ui-text-google-fonts:1.8.0")

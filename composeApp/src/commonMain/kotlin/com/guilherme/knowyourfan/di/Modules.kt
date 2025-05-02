@@ -10,6 +10,7 @@ import com.guilherme.knowyourfan.knowyourfan.domain.DataStoreRepository
 import com.guilherme.knowyourfan.knowyourfan.domain.RecommendationRepository
 import com.guilherme.knowyourfan.knowyourfan.presentation.AuthenticationViewModel
 import com.guilherme.knowyourfan.knowyourfan.presentation.HomeViewModel
+import com.guilherme.knowyourfan.knowyourfan.presentation.ProfileViewModel
 import com.guilherme.knowyourfan.knowyourfan.presentation.SignUpViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
@@ -24,4 +25,5 @@ val sharedModules = module {
     viewModel { AuthenticationViewModel(get()) }
     viewModel { SignUpViewModel(get(), get()) }
     viewModel { HomeViewModel(get(), get(), get(), get(), get()) }
+    viewModel { ProfileViewModel() }
 }
