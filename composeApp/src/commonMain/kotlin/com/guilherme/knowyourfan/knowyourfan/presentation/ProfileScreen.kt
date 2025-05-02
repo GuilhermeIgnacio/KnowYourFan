@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import knowyourfan.composeapp.generated.resources.Res
+import knowyourfan.composeapp.generated.resources.connected
 import knowyourfan.composeapp.generated.resources.connected_accounts
 import knowyourfan.composeapp.generated.resources.furia_logo
 import knowyourfan.composeapp.generated.resources.link_icon
@@ -54,7 +55,7 @@ import org.jetbrains.compose.resources.vectorResource
 fun ProfileScreen(
     viewModel: ProfileViewModel,
     onReturnButtonClicked: () -> Unit,
-    onSignOutButtonClicked: () -> Unit
+    onSignOutButtonClicked: () -> Unit,
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -128,7 +129,9 @@ fun ProfileScreen(
                         )
 
                         Text(
-                            text = if (state.isLinkedWithX) "Connected" else stringResource(Res.string.not_connected),
+                            text = if (state.isLinkedWithX) stringResource(Res.string.connected) else stringResource(
+                                Res.string.not_connected
+                            ),
                             color = if (state.isLinkedWithX) Color.Green else Color.Unspecified,
                             style = MaterialTheme.typography.bodySmall
                         )

@@ -33,6 +33,7 @@
 
     <!--  Profile  -->
     <string name="connected_accounts">Connected Accounts</string>
+    <string name="connected">Connected</string>
     <string name="not_connected">Not Connected</string>
     <string name="sign_out">Sign Out</string>
     <string name="account_link_success">Account linked successfully</string>

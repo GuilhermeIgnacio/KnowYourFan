@@ -33,8 +33,11 @@
 
     <!--  Profile  -->
     <string name="connected_accounts">Contas Conectadas</string>
+    <string name="connected">Conectada</string>
     <string name="not_connected">Não Conectada</string>
     <string name="sign_out">Desconectar</string>
+    <string name="account_link_success">Conta vinculada com sucesso</string>
+    <string name="getting_linked_accounts_error_message">Erro ao obter informações de contas vinculadas</string>
     <!--  Profile  -->
 
     <string name="unknown_error_occurred_message">Ocorreu um problema inesperado</string>
