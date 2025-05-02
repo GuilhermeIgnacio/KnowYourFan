@@ -8,6 +8,7 @@ import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.model.Inline
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.model.Part
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.model.RequestBody
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.model.Response
+import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.model.UserInterests
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -104,10 +105,20 @@ class GeminiImpl : GeminiService {
         }
     }
 
-    override suspend fun getRecommendations(): Result<ApiResponse, GeminiError.Recommendations> {
+    override suspend fun getRecommendations(userInterests: UserInterests): Result<ApiResponse, GeminiError.Recommendations> {
+
+        val events = userInterests.events.joinToString(separator = ", ")
+        val interestGames = userInterests.interestGames.joinToString(separator = ", ")
+        val purchases = userInterests.purchases.joinToString(separator = ", ")
+
+        println("events -> ${events}")
+        println("interestGames -> ${interestGames}")
+        println("purchases -> ${purchases}")
 
         val prompt =
-            "**Tarefa:** Encontrar as notícias mais recentes **que sejam relevantes para este perfil de usuário tendo como contexto o mundo dos e-sports. Jogos de interesse: Counter-Strike, Valorant. Eventos que participou(presenciais e online): Major Rio 2022. Compras no último ano: Jersey Furia**.\\n\\n**Instruções:**\\n1. Utilize a busca do Google (Grounding with Google Search) para encontrar as notícias mais recentes e relevantes sobre o assunto fornecido.\\n2. Para **CADA** notícia encontrada, extraia e apresente as informações **EXATAMENTE** na seguinte estrutura:\\n\\n    **Título:** [Título completo da notícia]\\n    **Link:** [URL completo para a notícia]\\n    **Data:** [Data de publicação da notícia (formato: DD/MM/AAAA, se disponível, ou a descrição mais próxima como \\\"há X horas\\\", \\\"ontem\\\")]\\n\\n3. Liste cada notícia como um bloco separado, seguindo rigorosamente a estrutura acima.\\n4. Priorize as notícias publicadas nas últimas 24-48 horas, se possível.\\n5. Não adicione nenhum texto introdutório, resumo, análise ou conclusão. Apresente *apenas* a lista de notícias formatadas conforme solicitado."
+            "**Tarefa:** Encontrar as notícias mais recentes **que sejam relevantes para este perfil de usuário tendo como contexto o mundo dos e-sports. Jogos de interesse: ${interestGames}. Eventos que participou(presenciais e online): ${events}. Compras no último ano: ${purchases}**.\\n\\n**Instruções:**\\n1. Utilize a busca do Google (Grounding with Google Search) para encontrar as notícias mais recentes e relevantes sobre o assunto fornecido.\\n2. Para **CADA** notícia encontrada, extraia e apresente as informações **EXATAMENTE** na seguinte estrutura:\\n\\n    **Título:** [Título completo da notícia]\\n    **Link:** [URL completo para a notícia]\\n    **Data:** [Data de publicação da notícia (formato: DD/MM/AAAA, se disponível, ou a descrição mais próxima como \\\"há X horas\\\", \\\"ontem\\\")]\\n\\n3. Liste cada notícia como um bloco separado, seguindo rigorosamente a estrutura acima.\\n4. Priorize as notícias publicadas nas últimas 24-48 horas, se possível.\\n5. Não adicione nenhum texto introdutório, resumo, análise ou conclusão. Apresente *apenas* a lista de notícias formatadas conforme solicitado."
+
+        println(prompt)
 
         val requestBody = buildJsonObject {
             put("contents", buildJsonArray {

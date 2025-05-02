@@ -18,11 +18,15 @@ import com.google.firebase.auth.FirebaseAuthWebException
 import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.TwitterAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.toObject
 import com.guilherme.knowyourfan.MainActivity
+import com.guilherme.knowyourfan.core.domain.DatabaseError
 import com.guilherme.knowyourfan.core.domain.LinkingError
 import com.guilherme.knowyourfan.core.domain.UserCheckError
 import com.guilherme.knowyourfan.domain.AuthenticationError
 import com.guilherme.knowyourfan.domain.Result
+import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.model.UserInterests
 import kotlinx.coroutines.tasks.await
 
 class FirebaseAuthenticationImpl(
@@ -103,7 +107,8 @@ class FirebaseAuthenticationImpl(
         val currentUser = auth.currentUser
 
         return if (currentUser != null) {
-            val foo = currentUser.providerData.any { it.providerId == TwitterAuthProvider.PROVIDER_ID }
+            val foo =
+                currentUser.providerData.any { it.providerId == TwitterAuthProvider.PROVIDER_ID }
             Result.Success(foo)
         } else {
             Result.Error(UserCheckError.User.NULL_USER)
@@ -146,4 +151,31 @@ class FirebaseAuthenticationImpl(
             }
         )
     }
+
+    override suspend fun getUserInterests(): Result<UserInterests, DatabaseError.DatabaseRead> {
+
+        val currentUser = auth.currentUser
+
+        return try {
+            if (currentUser != null) {
+                val snapshot = db.collection("users").document(currentUser.uid).get().await()
+                val userInterests = snapshot.toObject<UserInterests>() ?: UserInterests()
+
+                Result.Success(userInterests)
+            } else {
+                Result.Error(DatabaseError.DatabaseRead.NULL_USER)
+            }
+        } catch (e: FirebaseFirestoreException) {
+            e.printStackTrace()
+            val error = when (e.code) {
+                FirebaseFirestoreException.Code.PERMISSION_DENIED -> DatabaseError.DatabaseRead.PERMISSION_DENIED
+                FirebaseFirestoreException.Code.NOT_FOUND -> DatabaseError.DatabaseRead.NOT_FOUND
+                else -> DatabaseError.DatabaseRead.UNKNOWN
+            }
+            Result.Error(error)
+        }
+
+
+    }
+
 }

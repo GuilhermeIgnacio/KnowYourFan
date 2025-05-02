@@ -2,6 +2,7 @@ package com.guilherme.knowyourfan.knowyourfan.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.guilherme.knowyourfan.core.domain.DatabaseError
 import com.guilherme.knowyourfan.core.domain.GeminiError
 import com.guilherme.knowyourfan.core.domain.LinkingError
 import com.guilherme.knowyourfan.core.domain.UserCheckError
@@ -15,6 +16,9 @@ import com.guilherme.knowyourfan.knowyourfan.domain.RecommendationRepository
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.already_linked_account_exception_message
 import knowyourfan.composeapp.generated.resources.firebase_auth_too_many_requestes_exception_message
+import knowyourfan.composeapp.generated.resources.firestore_not_found
+import knowyourfan.composeapp.generated.resources.firestore_null_user
+import knowyourfan.composeapp.generated.resources.firestore_permission_denied
 import knowyourfan.composeapp.generated.resources.mfa_exception_message
 import knowyourfan.composeapp.generated.resources.network_exception_message
 import knowyourfan.composeapp.generated.resources.no_browser_found_exception_message
@@ -35,12 +39,12 @@ data class HomeState(
     val isLinkedWithX: Boolean = false,
     val errorMessage: StringResource? = null,
     val recommendations: List<Recommendation> = emptyList(),
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
 )
 
 sealed interface HomeEvents {
     data object OnLinkWithXButtonClicked : HomeEvents
-    data object OnContinueWithoutXButtonClicked: HomeEvents
+    data object OnContinueWithoutXButtonClicked : HomeEvents
     data object OnHomeScreenLoaded : HomeEvents
     data class OnCardClicked(val value: String) : HomeEvents
 }
@@ -51,7 +55,7 @@ class HomeViewModel(
     private val gemini: GeminiService,
     private val recommendation: RecommendationRepository,
     private val dataStore: DataStoreRepository,
-    private val browserOpener: BrowserOpener
+    private val browserOpener: BrowserOpener,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -144,44 +148,58 @@ class HomeViewModel(
 
     private fun getRecommendations() {
         viewModelScope.launch {
-            when (val result = gemini.getRecommendations()) {
+
+            when (val result = firebaseAuthentication.getUserInterests()) {
                 is Result.Success -> {
+                    when (val geminiResult = gemini.getRecommendations(result.data)) {
+                        is Result.Success -> {
 
-                    val foo = result.data.candidates
-                        .asSequence()
-                        .mapNotNull { it.grounding }
-                        .flatMap { grounding ->
-                            grounding.chunks.flatMap { chunk ->
-                                grounding.supports.map { support ->
-
-                                    parseRecommendation(support.segment.text)
-
-                                    /*Recommendation(
-                                        title = support.segment.text,
-                                        link = "support.segment.text"
-                                    )*/
+                            val foo = geminiResult.data.candidates
+                                .asSequence()
+                                .mapNotNull { it.grounding }
+                                .flatMap { grounding ->
+                                    grounding.chunks.flatMap { chunk ->
+                                        grounding.supports.map { support ->
+                                            parseRecommendation(support.segment.text)
+                                        }
+                                    }
                                 }
+                                .toList()
+
+                            recommendation.cacheData(foo)
+
+                            dataStore.updateLastApiCallTime()
+                        }
+
+                        is Result.Error -> {
+                            val errorMessage = when (geminiResult.error) {
+                                GeminiError.Recommendations.UNKNOWN -> "TODO()"
+                                GeminiError.Recommendations.BAD_REQUEST -> "TODO()"
+                                GeminiError.Recommendations.UNAUTHORIZED -> "TODO()"
+                                GeminiError.Recommendations.SERVER_ERROR -> "TODO()"
+                                GeminiError.Recommendations.SERVICE_UNAVAILABLE -> "TODO()"
                             }
                         }
-                        .toList()
 
-                    recommendation.cacheData(foo)
-
-                    dataStore.updateLastApiCallTime()
+                        Result.Loading -> {}
+                    }
                 }
 
                 is Result.Error -> {
                     val errorMessage = when (result.error) {
-                        GeminiError.Recommendations.UNKNOWN -> "TODO()"
-                        GeminiError.Recommendations.BAD_REQUEST -> "TODO()"
-                        GeminiError.Recommendations.UNAUTHORIZED -> "TODO()"
-                        GeminiError.Recommendations.SERVER_ERROR -> "TODO()"
-                        GeminiError.Recommendations.SERVICE_UNAVAILABLE -> "TODO()"
+                        DatabaseError.DatabaseRead.NULL_USER -> Res.string.firestore_null_user
+                        DatabaseError.DatabaseRead.PERMISSION_DENIED -> Res.string.firestore_permission_denied
+                        DatabaseError.DatabaseRead.NOT_FOUND -> Res.string.firestore_not_found
+                        DatabaseError.DatabaseRead.UNKNOWN -> Res.string.unknown_error_occurred_message
                     }
+
+                    _state.update { it.copy(errorMessage = errorMessage) }
+
                 }
 
                 Result.Loading -> {}
             }
+
 
         }
     }

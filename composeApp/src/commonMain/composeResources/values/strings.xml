@@ -65,4 +65,8 @@
     <string name="no_browser_found_exception_message">No application available to complete the Twitter sign-in flow.</string>
     <string name="already_linked_account_exception_message">This Twitter account is already linked to another user.</string>
 
+    <string name="firestore_null_user">Error fetching user interests: null user</string>
+    <string name="firestore_permission_denied">Error fetching user interests: permission denied</string>
+    <string name="firestore_not_found">Error fetching user interests: data not found</string>
+
 </resources>
