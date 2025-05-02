@@ -25,4 +25,6 @@ interface FirebaseAuthentication {
 
     suspend fun getUserInterests(): Result<UserInterests, DatabaseError.DatabaseRead>
 
+    suspend fun signOut()
+
 }

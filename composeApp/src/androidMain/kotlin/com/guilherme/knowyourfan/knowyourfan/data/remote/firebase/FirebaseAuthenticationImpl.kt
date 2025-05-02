@@ -178,4 +178,8 @@ class FirebaseAuthenticationImpl(
 
     }
 
+    override suspend fun signOut() {
+        auth.signOut()
+    }
+
 }

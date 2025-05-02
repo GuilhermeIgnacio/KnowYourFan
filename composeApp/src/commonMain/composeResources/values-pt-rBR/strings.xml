@@ -31,6 +31,12 @@
     <string name="continue_without_x">Continuar sem X</string>
     <!--  Home  -->
 
+    <!--  Profile  -->
+    <string name="connected_accounts">Contas Conectadas</string>
+    <string name="not_connected">Não Conectada</string>
+    <string name="sign_out">Desconectar</string>
+    <!--  Profile  -->
+
     <string name="unknown_error_occurred_message">Ocorreu um problema inesperado</string>
 
     <string name="get_credential_cancellation_exception_message">Operação cancelada pelo usuário.</string>

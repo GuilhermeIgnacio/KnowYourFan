@@ -31,6 +31,14 @@
     <string name="continue_without_x">Continue Without X</string>
     <!--  Home  -->
 
+    <!--  Profile  -->
+    <string name="connected_accounts">Connected Accounts</string>
+    <string name="not_connected">Not Connected</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="account_link_success">Account linked successfully</string>
+    <string name="getting_linked_accounts_error_message">Error getting linked accounts data</string>
+    <!--  Profile  -->
+
 
     <string name="unknown_error_occurred_message">An unexpected problem occurred</string>
 

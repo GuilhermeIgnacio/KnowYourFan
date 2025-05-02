@@ -25,5 +25,5 @@ val sharedModules = module {
     viewModel { AuthenticationViewModel(get()) }
     viewModel { SignUpViewModel(get(), get()) }
     viewModel { HomeViewModel(get(), get(), get(), get(), get()) }
-    viewModel { ProfileViewModel() }
+    viewModel { ProfileViewModel(get()) }
 }

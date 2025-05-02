@@ -23,7 +23,7 @@ fun App() {
 
     val navController = rememberNavController()
     Surface(modifier = Modifier.fillMaxSize()) {
-        NavHost(navController = navController, startDestination = Route.HomeGraph) {
+        NavHost(navController = navController, startDestination = Route.AuthGraph) {
             navigation<Route.AuthGraph>(
                 startDestination = Route.AuthenticationScreen
             ) {
@@ -59,7 +59,8 @@ fun App() {
                     val viewModel = koinViewModel<ProfileViewModel>()
                     ProfileScreen(
                         viewModel = viewModel,
-                        onReturnButtonClicked = {navController.navigate(Route.HomeScreen)}
+                        onReturnButtonClicked = { navController.navigate(Route.HomeScreen) },
+                        onSignOutButtonClicked = { navController.navigate(Route.AuthGraph) }
                     )
                 }
 
