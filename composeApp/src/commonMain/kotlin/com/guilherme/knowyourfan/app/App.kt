@@ -38,7 +38,8 @@ fun App() {
                     val signUpViewModel = koinViewModel<SignUpViewModel>()
                     SignUpScreen(
                         viewModel = signUpViewModel,
-                        onAccountCreated = { navController.navigate(Route.HomeGraph) }
+                        onAccountCreated = { navController.navigate(Route.HomeGraph) },
+                        onReturnButtonClicked = { navController.navigate(Route.AuthenticationScreen) }
                     )
                 }
 
