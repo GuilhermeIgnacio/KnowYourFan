@@ -40,6 +40,9 @@ kotlin {
             //SqlDelight
             implementation("app.cash.sqldelight:android-driver:2.0.2")
 
+            //SplashScreen
+            implementation("androidx.core:core-splashscreen:1.0.1")
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
