@@ -15,15 +15,19 @@ import com.guilherme.knowyourfan.knowyourfan.domain.Recommendation
 import com.guilherme.knowyourfan.knowyourfan.domain.RecommendationRepository
 import knowyourfan.composeapp.generated.resources.Res
 import knowyourfan.composeapp.generated.resources.already_linked_account_exception_message
+import knowyourfan.composeapp.generated.resources.bad_request
 import knowyourfan.composeapp.generated.resources.firebase_auth_too_many_requestes_exception_message
 import knowyourfan.composeapp.generated.resources.firestore_not_found
 import knowyourfan.composeapp.generated.resources.firestore_null_user
 import knowyourfan.composeapp.generated.resources.firestore_permission_denied
+import knowyourfan.composeapp.generated.resources.internal_server_error
 import knowyourfan.composeapp.generated.resources.mfa_exception_message
 import knowyourfan.composeapp.generated.resources.network_exception_message
 import knowyourfan.composeapp.generated.resources.no_browser_found_exception_message
 import knowyourfan.composeapp.generated.resources.null_credentials_exception_message
 import knowyourfan.composeapp.generated.resources.null_user_exception_message
+import knowyourfan.composeapp.generated.resources.service_unavailable
+import knowyourfan.composeapp.generated.resources.unauthorized
 import knowyourfan.composeapp.generated.resources.unknown_error_occurred_message
 import knowyourfan.composeapp.generated.resources.web_error_exception_message
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -173,12 +177,15 @@ class HomeViewModel(
 
                         is Result.Error -> {
                             val errorMessage = when (geminiResult.error) {
-                                GeminiError.Recommendations.UNKNOWN -> "TODO()"
-                                GeminiError.Recommendations.BAD_REQUEST -> "TODO()"
-                                GeminiError.Recommendations.UNAUTHORIZED -> "TODO()"
-                                GeminiError.Recommendations.SERVER_ERROR -> "TODO()"
-                                GeminiError.Recommendations.SERVICE_UNAVAILABLE -> "TODO()"
+                                GeminiError.Recommendations.BAD_REQUEST -> Res.string.bad_request
+                                GeminiError.Recommendations.UNAUTHORIZED -> Res.string.unauthorized
+                                GeminiError.Recommendations.SERVER_ERROR -> Res.string.internal_server_error
+                                GeminiError.Recommendations.SERVICE_UNAVAILABLE -> Res.string.service_unavailable
+                                GeminiError.Recommendations.UNKNOWN -> Res.string.unknown_error_occurred_message
                             }
+
+                            _state.update { it.copy(errorMessage = errorMessage) }
+
                         }
 
                         Result.Loading -> {}

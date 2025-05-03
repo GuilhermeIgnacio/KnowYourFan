@@ -86,7 +86,16 @@ class GeminiImpl : GeminiService {
 
             val foo = apiResponse.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.text
 
-            Result.Success(foo)
+            println(response.bodyAsText())
+
+            when (response.status) {
+                HttpStatusCode.OK -> Result.Success(foo)
+                HttpStatusCode.BadRequest -> Result.Error(GeminiError.Gemini.BAD_REQUEST)
+                HttpStatusCode.Unauthorized -> Result.Error(GeminiError.Gemini.UNAUTHORIZED)
+                HttpStatusCode.InternalServerError -> Result.Error(GeminiError.Gemini.SERVER_ERROR)
+                HttpStatusCode.ServiceUnavailable -> Result.Error(GeminiError.Gemini.SERVICE_UNAVAILABLE)
+                else -> Result.Error(GeminiError.Gemini.UNKNOWN)
+            }
 
         } catch (e: Exception) {
             val error = when (e) {
@@ -98,7 +107,7 @@ class GeminiImpl : GeminiService {
                 is IOException -> GeminiError.Gemini.IO
                 else -> GeminiError.Gemini.UNKNOWN
             }
-
+            e.printStackTrace()
             Result.Error(error)
         } finally {
             client.close()

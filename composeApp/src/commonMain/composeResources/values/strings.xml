@@ -22,6 +22,7 @@
     <string name="upload_id_photo">Upload your ID photo</string>
     <string name="interest_games_label">Select games you`re interested in</string>
     <string name="register_button">Register</string>
+    <string name="error_processing_id_photo">Error processing ID photo</string>
     <!--  SignUp  -->
 
     <!--  Home  -->
@@ -77,5 +78,10 @@
     <string name="firestore_null_user">Error fetching user interests: null user</string>
     <string name="firestore_permission_denied">Error fetching user interests: permission denied</string>
     <string name="firestore_not_found">Error fetching user interests: data not found</string>
+
+    <string name="bad_request">Oops! It looks like something went wrong with your request. Please try again later.</string>
+    <string name="unauthorized">Sorry, something went wrong on our end. Please try again later.</string>
+    <string name="internal_server_error">Sorry, something went wrong on our end. Please try again later.</string>
+    <string name="service_unavailable">Our service is temporarily down for maintenance. Please try again later.</string>
 
 </resources>

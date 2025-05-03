@@ -11,7 +11,11 @@ sealed interface GeminiError : Error {
         SERVER_RESPONSE,
         UNRESOLVED_ADDRESS,
         UNKNOWN,
-        IO
+        IO,
+        BAD_REQUEST,
+        UNAUTHORIZED,
+        SERVER_ERROR,
+        SERVICE_UNAVAILABLE
     }
 
     enum class Recommendations : Error {

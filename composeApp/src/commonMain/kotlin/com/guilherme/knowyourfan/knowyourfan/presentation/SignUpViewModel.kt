@@ -9,8 +9,10 @@ import com.guilherme.knowyourfan.domain.Result
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.GeminiService
 import com.guilherme.knowyourfan.knowyourfan.data.remote.firebase.FirebaseAuthentication
 import knowyourfan.composeapp.generated.resources.Res
+import knowyourfan.composeapp.generated.resources.bad_request
 import knowyourfan.composeapp.generated.resources.client_request_exception
 import knowyourfan.composeapp.generated.resources.cpf_does_not_matches
+import knowyourfan.composeapp.generated.resources.error_processing_id_photo
 import knowyourfan.composeapp.generated.resources.firebase_auth_invalid_credentials_exception_message
 import knowyourfan.composeapp.generated.resources.firebase_auth_invalid_user_exception_message
 import knowyourfan.composeapp.generated.resources.firebase_auth_user_collision_exception_message
@@ -18,9 +20,12 @@ import knowyourfan.composeapp.generated.resources.firebase_auth_weak_password_ex
 import knowyourfan.composeapp.generated.resources.get_credential_cancellation_exception_message
 import knowyourfan.composeapp.generated.resources.get_credential_interrupted_exception_message
 import knowyourfan.composeapp.generated.resources.get_credential_unknown_exception_message
+import knowyourfan.composeapp.generated.resources.internal_server_error
 import knowyourfan.composeapp.generated.resources.redirect_response_exception
 import knowyourfan.composeapp.generated.resources.serialization_exception
 import knowyourfan.composeapp.generated.resources.server_response_exception
+import knowyourfan.composeapp.generated.resources.service_unavailable
+import knowyourfan.composeapp.generated.resources.unauthorized
 import knowyourfan.composeapp.generated.resources.unknown_error_occurred_message
 import knowyourfan.composeapp.generated.resources.unresolved_address_exception
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -192,9 +197,11 @@ class SignUpViewModel(
 
                                         val email = _state.value.emailTextField
                                         val password = _state.value.passwordTextField
-                                        val purchases = _state.value.lastYearPurchasesList.map { it.game }
+                                        val purchases =
+                                            _state.value.lastYearPurchasesList.map { it.game }
                                         val events = _state.value.eventsList.map { it.game }
-                                        val interestGames = _state.value.interestGamesList.map { it.game }
+                                        val interestGames =
+                                            _state.value.interestGamesList.map { it.game }
 
 
 
@@ -234,12 +241,14 @@ class SignUpViewModel(
 
                                                 }
 
-                                                Result.Loading -> TODO()
+                                                Result.Loading -> {}
                                             }
                                         }
 
                                     } else if (response.contains("false", ignoreCase = true)) {
                                         _state.update { it.copy(errorMessage = Res.string.cpf_does_not_matches) }
+                                    } else {
+                                        _state.update { it.copy(errorMessage = Res.string.error_processing_id_photo) }
                                     }
                                 }
 
@@ -255,6 +264,10 @@ class SignUpViewModel(
                                     GeminiError.Gemini.SERVER_RESPONSE -> Res.string.server_response_exception
                                     GeminiError.Gemini.UNRESOLVED_ADDRESS -> Res.string.unresolved_address_exception
                                     GeminiError.Gemini.IO -> Res.string.unknown_error_occurred_message
+                                    GeminiError.Gemini.BAD_REQUEST -> Res.string.bad_request
+                                    GeminiError.Gemini.UNAUTHORIZED -> Res.string.unauthorized
+                                    GeminiError.Gemini.SERVER_ERROR -> Res.string.internal_server_error
+                                    GeminiError.Gemini.SERVICE_UNAVAILABLE -> Res.string.service_unavailable
                                     GeminiError.Gemini.UNKNOWN -> Res.string.unknown_error_occurred_message
                                 }
 
@@ -287,7 +300,12 @@ class SignUpViewModel(
                     val list = _state.value.lastYearPurchasesList.toMutableList()
                     list.add(chipItem)
 
-                    _state.update { it.copy(lastYearPurchasesList = list, lastYearPurchasesTextField = null) }
+                    _state.update {
+                        it.copy(
+                            lastYearPurchasesList = list,
+                            lastYearPurchasesTextField = null
+                        )
+                    }
 
                 } else {
                     _state.update { it.copy(lastYearPurchasesTextField = event.value) }

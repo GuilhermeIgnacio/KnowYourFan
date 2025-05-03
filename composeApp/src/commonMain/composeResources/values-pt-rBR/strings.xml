@@ -38,6 +38,7 @@
     <string name="sign_out">Desconectar</string>
     <string name="account_link_success">Conta vinculada com sucesso</string>
     <string name="getting_linked_accounts_error_message">Erro ao obter informações de contas vinculadas</string>
+    <string name="error_processing_id_photo">Erro ao processar foto do documento</string>
     <!--  Profile  -->
 
     <string name="unknown_error_occurred_message">Ocorreu um problema inesperado</string>
@@ -76,5 +77,10 @@
     <string name="firestore_null_user">Erro ao buscar interesses do usuário: usuário nulo</string>
     <string name="firestore_permission_denied">Erro ao buscar interesses do usuário: permissão negada</string>
     <string name="firestore_not_found">Erro ao buscar interesses do usuário: dados não encontrados</string>
+
+    <string name="bad_request">Ops! Parece que algo deu errado com sua solicitação. Por favor, reinicie o aplicativo e tente novamente.</string>
+    <string name="unauthorized">Desculpe, algo deu errado do nosso lado. Por favor, tente novamente mais tarde.</string>
+    <string name="internal_server_error">Desculpe, algo deu errado do nosso lado. Por favor, tente novamente mais tarde.</string>
+    <string name="service_unavailable">Nosso serviço está temporariamente indisponível para manutenção. Por favor, tente novamente mais tarde.</string>
 
 </resources>
