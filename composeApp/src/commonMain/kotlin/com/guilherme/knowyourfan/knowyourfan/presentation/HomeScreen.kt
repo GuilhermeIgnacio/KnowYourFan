@@ -35,8 +35,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -48,6 +50,7 @@ import knowyourfan.composeapp.generated.resources.continue_without_x
 import knowyourfan.composeapp.generated.resources.furia_logo
 import knowyourfan.composeapp.generated.resources.link_x_account
 import knowyourfan.composeapp.generated.resources.link_x_account_benefits
+import knowyourfan.composeapp.generated.resources.try_again_button_label
 import knowyourfan.composeapp.generated.resources.x_twitter_brands
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.imageResource
@@ -57,7 +60,7 @@ import org.jetbrains.compose.resources.vectorResource
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    onProfileButtonClicked: () -> Unit
+    onProfileButtonClicked: () -> Unit,
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -70,8 +73,11 @@ fun HomeScreen(
     LaunchedEffect(state.errorMessage) {
         state.errorMessage?.let {
             val foo = snackBarHostState.showSnackbar(message = getString(it))
-            when (foo){
-                SnackbarResult.Dismissed -> { viewModel.clearErrorMessage() }
+            when (foo) {
+                SnackbarResult.Dismissed -> {
+                    viewModel.clearErrorMessage()
+                }
+
                 SnackbarResult.ActionPerformed -> {}
             }
         }
@@ -88,7 +94,8 @@ fun HomeScreen(
             LaunchedEffect(Unit) { onEvent(HomeEvents.OnHomeScreenLoaded) }
             LazyColumn(
                 modifier = Modifier.fillMaxWidth().statusBarsPadding().navigationBarsPadding(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
                 item {
@@ -110,6 +117,17 @@ fun HomeScreen(
                                 imageVector = Icons.Filled.Person,
                                 contentDescription = ""
                             )
+                        }
+                    }
+                }
+
+                if (state.isError) {
+                    item {
+                        Button(
+                            modifier = Modifier,
+                            onClick = { onEvent(HomeEvents.OnTryAgainButtonClicked) }
+                        ) {
+                            Text(stringResource(Res.string.try_again_button_label))
                         }
                     }
                 }

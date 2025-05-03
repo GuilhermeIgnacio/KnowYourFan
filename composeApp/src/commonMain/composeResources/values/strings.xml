@@ -30,6 +30,8 @@
     <string name="link_x_account_benefits">Get better personalized information and recommendations</string>
     <string name="continue_with_x">Continue With X</string>
     <string name="continue_without_x">Continue Without X</string>
+    <string name="parsing_error_message">We encountered a problem while processing the recommendations. Please try again later or contact support if the issue persists.</string>
+    <string name="try_again_button_label">Try Again</string>
     <!--  Home  -->
 
     <!--  Profile  -->

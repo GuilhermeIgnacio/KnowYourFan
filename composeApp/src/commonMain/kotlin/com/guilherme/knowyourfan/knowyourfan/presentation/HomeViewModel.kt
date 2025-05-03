@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.guilherme.knowyourfan.core.domain.DatabaseError
 import com.guilherme.knowyourfan.core.domain.GeminiError
 import com.guilherme.knowyourfan.core.domain.LinkingError
+import com.guilherme.knowyourfan.core.domain.ParsingError
 import com.guilherme.knowyourfan.core.domain.UserCheckError
 import com.guilherme.knowyourfan.domain.Result
 import com.guilherme.knowyourfan.knowyourfan.data.remote.api.gemini.GeminiService
@@ -26,6 +27,7 @@ import knowyourfan.composeapp.generated.resources.network_exception_message
 import knowyourfan.composeapp.generated.resources.no_browser_found_exception_message
 import knowyourfan.composeapp.generated.resources.null_credentials_exception_message
 import knowyourfan.composeapp.generated.resources.null_user_exception_message
+import knowyourfan.composeapp.generated.resources.parsing_error_message
 import knowyourfan.composeapp.generated.resources.service_unavailable
 import knowyourfan.composeapp.generated.resources.unauthorized
 import knowyourfan.composeapp.generated.resources.unknown_error_occurred_message
@@ -44,6 +46,7 @@ data class HomeState(
     val errorMessage: StringResource? = null,
     val recommendations: List<Recommendation> = emptyList(),
     val isLoading: Boolean = false,
+    val isError: Boolean = false,
 )
 
 sealed interface HomeEvents {
@@ -51,6 +54,7 @@ sealed interface HomeEvents {
     data object OnContinueWithoutXButtonClicked : HomeEvents
     data object OnHomeScreenLoaded : HomeEvents
     data class OnCardClicked(val value: String) : HomeEvents
+    data object OnTryAgainButtonClicked : HomeEvents
 }
 
 @OptIn(ExperimentalTime::class)
@@ -143,6 +147,10 @@ class HomeViewModel(
             HomeEvents.OnContinueWithoutXButtonClicked -> {
                 _state.update { it.copy(isLinkedWithX = true) }
             }
+
+            HomeEvents.OnTryAgainButtonClicked -> {
+                getRecommendations()
+            }
         }
     }
 
@@ -159,21 +167,43 @@ class HomeViewModel(
                     when (val geminiResult = gemini.getRecommendations(result.data)) {
                         is Result.Success -> {
 
-                            val foo = geminiResult.data.candidates
+                            val rawRecommendationsList = geminiResult.data.candidates
                                 .asSequence()
                                 .mapNotNull { it.grounding }
                                 .flatMap { grounding ->
                                     grounding.chunks.flatMap { chunk ->
                                         grounding.supports.map { support ->
-                                            parseRecommendation(support.segment.text)
+                                            support.segment.text
                                         }
                                     }
                                 }
                                 .toList()
 
-                            recommendation.cacheData(foo)
+                            when (val parsingResult = parseRecommendation(rawRecommendationsList)) {
+                                is Result.Success -> {
+                                    recommendation.cacheData(parsingResult.data)
+                                    dataStore.updateLastApiCallTime()
+                                    _state.update { it.copy(isError = false) }
+                                }
 
-                            dataStore.updateLastApiCallTime()
+                                is Result.Error -> {
+                                    val errorMessage = when (parsingResult.error) {
+                                        ParsingError.ParsingRecommendations.UNKNOWN -> Res.string.parsing_error_message
+                                    }
+
+                                    _state.update {
+                                        it.copy(
+                                            errorMessage = errorMessage,
+                                            isError = true
+                                        )
+                                    }
+
+                                }
+
+                                Result.Loading -> {}
+                            }
+
+
                         }
 
                         is Result.Error -> {
@@ -185,7 +215,7 @@ class HomeViewModel(
                                 GeminiError.Recommendations.UNKNOWN -> Res.string.unknown_error_occurred_message
                             }
 
-                            _state.update { it.copy(errorMessage = errorMessage) }
+                            _state.update { it.copy(errorMessage = errorMessage, isError = true) }
 
                         }
 
@@ -212,26 +242,30 @@ class HomeViewModel(
         }.invokeOnCompletion { _state.update { it.copy(isLoading = false) } }
     }
 
-    private fun parseRecommendation(rawText: String): Recommendation {
-        // Regex sem opções especiais, apenas três grupos de captura:
-        // 1: título, 2: link, 3: data
+    private fun parseRecommendation(
+        rawText: List<String>,
+    ): Result<List<Recommendation>, ParsingError.ParsingRecommendations> {
         val regex = Regex(
             """\*\*Título:\*\*\s*(.+?)\r?\n\*\*Link:\*\*\s*(.+?)\r?\n\*\*Data:\*\*\s*(.+)"""
         )
 
-        val match = regex.find(rawText.trim())
-            ?: throw IllegalArgumentException("Formato inválido: $rawText")
+        val list = mutableListOf<Recommendation>()
 
-        // groupValues[0] = string toda; [1] = título; [2] = link; [3] = data
-        val titleText = match.groupValues[1]
-        val linkText = match.groupValues[2]
-        val dateText = match.groupValues[3]
+        rawText.forEach {
 
-        // Parser de data: "29 de abril de 2025"
-        /*val formatter = DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy")
-        val date = LocalDate.parse(dateText, formatter)*/
+            val match = regex.find(it.trim())
+            if (match == null) {
+                return Result.Error(ParsingError.ParsingRecommendations.UNKNOWN)
+            }
 
-        return Recommendation(titleText, linkText /*date*/)
+            val (titleText, linkText, dateText) = match.destructured
+
+            val recommendation = Recommendation(titleText, linkText)
+            list.add(recommendation)
+        }
+
+        return Result.Success(list)
+
     }
 
 }

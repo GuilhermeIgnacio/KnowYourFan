@@ -29,6 +29,8 @@
     <string name="link_x_account_benefits">Obtenha informações e recomendações mais personalizadas</string>
     <string name="continue_with_x">Continuar com X</string>
     <string name="continue_without_x">Continuar sem X</string>
+    <string name="parsing_error_message">Ocorreu um problema ao processar as recomendações. Tente novamente mais tarde ou entre em contato com o suporte se o erro persistir.</string>
+    <string name="try_again_button_label">Tentar de novo</string>
     <!--  Home  -->
 
     <!--  Profile  -->
