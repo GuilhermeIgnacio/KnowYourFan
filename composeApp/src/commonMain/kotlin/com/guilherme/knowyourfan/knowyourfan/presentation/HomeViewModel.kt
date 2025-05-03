@@ -151,6 +151,7 @@ class HomeViewModel(
     }
 
     private fun getRecommendations() {
+        _state.update { it.copy(isLoading = true) }
         viewModelScope.launch {
 
             when (val result = firebaseAuthentication.getUserInterests()) {
@@ -208,7 +209,7 @@ class HomeViewModel(
             }
 
 
-        }
+        }.invokeOnCompletion { _state.update { it.copy(isLoading = false) } }
     }
 
     private fun parseRecommendation(rawText: String): Recommendation {
