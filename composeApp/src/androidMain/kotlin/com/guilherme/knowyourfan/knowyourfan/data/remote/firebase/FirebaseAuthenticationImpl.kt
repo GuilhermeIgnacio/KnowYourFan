@@ -128,10 +128,6 @@ class FirebaseAuthenticationImpl(
                 )
                 .await()
 
-            val credential = linkResult.credential
-                ?: throw IllegalStateException()
-
-            user.linkWithCredential(credential).await()
         }.fold(
             onSuccess = {
                 Result.Success(Unit)

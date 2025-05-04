@@ -133,19 +133,25 @@ fun HomeScreen(
                 }
 
                 items(state.recommendations) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
-                        onClick = { onEvent(HomeEvents.OnCardClicked(it.link)) },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors()
-                            .copy(containerColor = Color(0xFF1f2937), contentColor = Color.White)
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(16.dp),
-                            text = it.title,
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.titleLarge
-                        )
+
+                    if (it.title.isNotEmpty() && it.link.isNotEmpty()) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
+                            onClick = { onEvent(HomeEvents.OnCardClicked(it.link)) },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors()
+                                .copy(
+                                    containerColor = Color(0xFF1f2937),
+                                    contentColor = Color.White
+                                )
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(16.dp),
+                                text = it.title,
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
                     }
                 }
             }

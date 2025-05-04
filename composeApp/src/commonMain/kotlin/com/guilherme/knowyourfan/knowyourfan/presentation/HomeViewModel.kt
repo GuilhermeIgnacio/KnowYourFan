@@ -254,14 +254,16 @@ class HomeViewModel(
         rawText.forEach {
 
             val match = regex.find(it.trim())
-            if (match == null) {
-                return Result.Error(ParsingError.ParsingRecommendations.UNKNOWN)
+            if (match != null) {
+                val (titleText, linkText, dateText) = match.destructured
+
+                val recommendation = Recommendation(titleText, linkText)
+                list.add(recommendation)
+            } else {
+                //                return Result.Error(ParsingError.ParsingRecommendations.UNKNOWN)
+                list.add(Recommendation(title = "", link = ""))
             }
 
-            val (titleText, linkText, dateText) = match.destructured
-
-            val recommendation = Recommendation(titleText, linkText)
-            list.add(recommendation)
         }
 
         return Result.Success(list)

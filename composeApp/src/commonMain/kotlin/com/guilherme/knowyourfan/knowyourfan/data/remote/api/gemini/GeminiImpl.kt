@@ -109,8 +109,6 @@ class GeminiImpl : GeminiService {
             }
             e.printStackTrace()
             Result.Error(error)
-        } finally {
-            client.close()
         }
     }
 
